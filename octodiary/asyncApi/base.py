@@ -65,16 +65,23 @@ class AsyncBaseApi(SyncBaseApi):
         return_json: bool = False,
         return_raw_text: bool = False,
         required_token: bool = True,
+        return_raw_response: bool = False,
         **kwargs
     ):
         params = kwargs.pop("params", {})
         async with aiohttp.ClientSession() as session:
-            async with session.get(url=self.init_params(url, params), headers=self.headers(required_token, custom_headers), **kwargs) as response:
+            async with session.get(
+                url=self.init_params(url, params),
+                headers=self.headers(required_token, custom_headers),
+                **kwargs
+            ) as response:
                 await self._check_response(response)
                 RAW_TEXT = await response.text()
                 
                 return (
-                    await response.json()
+                    response
+                    if return_raw_response
+                    else await response.json()
                     if return_json
                     else RAW_TEXT
                     if return_raw_text
@@ -96,16 +103,23 @@ class AsyncBaseApi(SyncBaseApi):
         return_json: bool = False,
         return_raw_text: bool = False,
         required_token: bool = True,
+        return_raw_response: bool = False,
         **kwargs
     ):
         params = kwargs.pop("params", {})
         async with aiohttp.ClientSession() as session:
-            async with session.post(url=self.init_params(url, params), headers=self.headers(required_token, custom_headers), json=json, data=data, **kwargs) as response:
+            async with session.post(
+                url=self.init_params(url, params),
+                headers=self.headers(required_token, custom_headers),
+                json=json, data=data, **kwargs
+            ) as response:
                 await self._check_response(response)
                 RAW_TEXT = await response.text()
                 
                 return (
-                    await response.json()
+                    response
+                    if return_raw_response
+                    else await response.json()
                     if return_json
                     else RAW_TEXT
                     if return_raw_text
@@ -127,16 +141,23 @@ class AsyncBaseApi(SyncBaseApi):
         return_json: bool = False,
         return_raw_text: bool = False,
         required_token: bool = True,
+        return_raw_response: bool = False,
         **kwargs
     ):
         params = kwargs.pop("params", {})
         async with aiohttp.ClientSession() as session:
-            async with session.put(url=self.init_params(url, params), headers=self.headers(required_token, custom_headers), json=json, data=data, **kwargs) as response:
+            async with session.put(
+                url=self.init_params(url, params),
+                headers=self.headers(required_token, custom_headers),
+                json=json, data=data, **kwargs
+            ) as response:
                 await self._check_response(response)
                 RAW_TEXT = await response.text()
                 
                 return (
-                    await response.json()
+                    response
+                    if return_raw_response
+                    else await response.json()
                     if return_json
                     else RAW_TEXT
                     if return_raw_text
@@ -158,16 +179,23 @@ class AsyncBaseApi(SyncBaseApi):
         return_json: bool = False,
         return_raw_text: bool = False, 
         required_token: bool = True,
+        return_raw_response: bool = False,
         **kwargs
     ):
         params = kwargs.pop("params", {})
         async with aiohttp.ClientSession() as session:
-            async with session.delete(url=self.init_params(url, params), headers=self.headers(required_token, custom_headers), json=json, data=data, **kwargs) as response:
+            async with session.delete(
+                url=self.init_params(url, params),
+                headers=self.headers(required_token, custom_headers),
+                json=json, data=data, **kwargs
+            ) as response:
                 await self._check_response(response)
                 RAW_TEXT = await response.text()
                 
                 return (
-                    await response.json()
+                    response
+                    if return_raw_response
+                    else await response.json()
                     if return_json
                     else RAW_TEXT
                     if return_raw_text

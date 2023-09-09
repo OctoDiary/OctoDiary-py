@@ -73,19 +73,8 @@ class SyncBaseApi:
     
     def __init__(
         self,
-        username: Optional[str] = None,
-        password: Optional[str] = None,
         token: Optional[str] = None,
     ) -> None:
-        if not (username and password) and not token:
-            raise ValueError("Please provide either a username and password or a token.")
-        elif username and not password:
-            raise ValueError("Please provide a password.")
-        elif not username and password:
-            raise ValueError("Please provide a username.")
-        
-        self.username = username
-        self.password = password
         self.token = token
         self.session = requests.Session()
     
@@ -170,6 +159,7 @@ class SyncBaseApi:
         return_json: bool = False,
         return_raw_text: bool = False,
         required_token: bool = True,
+        return_raw_response: bool = False,
         **kwargs
     ):
         params = kwargs.pop("params", {})
@@ -178,7 +168,9 @@ class SyncBaseApi:
         RAW_TEXT = response.text
         
         return (
-            response.json()
+            response
+            if return_raw_response
+            else response.json()
             if return_json
             else RAW_TEXT
             if return_raw_text
@@ -200,6 +192,7 @@ class SyncBaseApi:
         return_json: bool = False,
         return_raw_text: bool = False,
         required_token: bool = True,
+        return_raw_response: bool = False,
         **kwargs
     ):
         params = kwargs.pop("params", {})
@@ -208,7 +201,9 @@ class SyncBaseApi:
         RAW_TEXT = response.text
         
         return (
-            response.json()
+            response
+            if return_raw_response
+            else response.json()
             if return_json
             else RAW_TEXT
             if return_raw_text
@@ -230,6 +225,7 @@ class SyncBaseApi:
         return_json: bool = False,
         return_raw_text: bool = False,
         required_token: bool = True,
+        return_raw_response: bool = False,
         **kwargs
     ):
         params = kwargs.pop("params", {})
@@ -238,7 +234,9 @@ class SyncBaseApi:
         RAW_TEXT = response.text
         
         return (
-            response.json()
+            response
+            if return_raw_response
+            else response.json()
             if return_json
             else RAW_TEXT
             if return_raw_text
@@ -260,6 +258,7 @@ class SyncBaseApi:
         return_json: bool = False,
         return_raw_text: bool = False,
         required_token: bool = True,
+        return_raw_response: bool = False,
         **kwargs
     ):
         params = kwargs.pop("params", {})
@@ -268,7 +267,9 @@ class SyncBaseApi:
         RAW_TEXT = response.text
         
         return (
-            response.json()
+            response
+            if return_raw_response
+            else response.json()
             if return_json
             else RAW_TEXT
             if return_raw_text

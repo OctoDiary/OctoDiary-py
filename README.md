@@ -39,10 +39,22 @@ pip3 install octodiary
 from octodiary.asyncApi.myschool import WebAsyncApi
 from asyncio import run
 
-async def main():
-    token = "<YOUR_API_TOKEN>"
-    api = WebAsyncApi(token=token)
+api = WebAsyncApi()
 
+async def login_gosuslugi():
+    # если у вас выключен вход с подтверждением (MFA):
+    TOKEN = await api.esia_login("<LOGIN>", "<PASSWORD>")
+
+    # если у вас включен вход с подтверждением (MFA):
+    await api.esia_login("<LOGIN>", "<PASSWORD>", True)
+    code_mfa = int(input("MFA Code: ").strip()) # запрашиваем у пользователя код (SMS/TOTP)
+    TOKEN = await api.esia_enter_MFA(code=code_mfa)
+    
+    return TOKEN
+
+async def main():
+    api.token = await login_gosuslugi() # получения токена по логину и паролю от госуслуг
+    
     # получить информацию о пользователе
     user_info = await api.get_user_info()
 
@@ -106,8 +118,21 @@ run(main())
 ``` python
 from octodiary.syncApi.myschool import WebSyncApi
 
-token = "<YOUR_API_TOKEN>"
-api = WebSyncApi(token=token)
+api = WebSyncApi()
+
+def login_gosuslugi():
+    # если у вас выключен вход с подтверждением (MFA):
+    TOKEN = api.esia_login("<LOGIN>", "<PASSWORD>")
+
+    # если у вас включен вход с подтверждением (MFA):
+    api.esia_login("<LOGIN>", "<PASSWORD>", True)
+    code_mfa = int(input("MFA Code: ").strip()) # запрашиваем у пользователя код (SMS/TOTP)
+    TOKEN = api.esia_enter_MFA(code=code_mfa)
+    
+    return TOKEN
+
+api.token = login_gosuslugi() # получения токена по логину и паролю от госуслуг
+
 
 # получить информацию о пользователе
 user_info = api.get_user_info()

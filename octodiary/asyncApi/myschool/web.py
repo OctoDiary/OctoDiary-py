@@ -1,8 +1,11 @@
+import re
 from datetime import date
 from typing import List, Union
 
-from bs4 import BeautifulSoup
+from aiohttp import ClientSession
+from aiohttp.cookiejar import CookieJar
 
+from octodiary.exceptions import APIError
 from octodiary.types import (
     AcademicYear,
     EventsResponse,
@@ -26,20 +29,90 @@ class WebAsyncApi(AsyncBaseApi):
     Async Web API class wrapper.
     """
 
-    async def get_esia_login_link(self) -> str:
-        """Получите ссылку для входа в систему ЕСИА(Госуслуги)."""
-        response: str = await self.get(
-            "https://authedu.mosreg.ru/v3/auth/esia/login",
-            required_token=False,
-            return_raw_text=True,
-            allow_redirects=False
+    
+    async def esia_login(self, username: str, password: str) -> Union[str, bool]:
+        """
+        Вход через ЕСИА(Госуслуги) и получение API-TOKEN.
+        Если вы получили ``False``, значит у вас стоит MFA,
+        используйте метод ``.esia_enter_MFA(code=<CODE>)``, где <CODE> - код MFA.
+        """
+        self.__cookie = CookieJar()
+        self.__session_login = ClientSession(cookie_jar=self.__cookie, headers=self.headers(False))
+        one: str = await (
+            await self.__session_login.get(
+                "https://authedu.mosreg.ru/v3/auth/esia/login",
+                allow_redirects=False,
+            )
+        ).text()
+        await self.__session_login.get(
+            re.findall(r"0\;url\=(.*?)\">", one)[0]
         )
-        return (
-            BeautifulSoup(response, "html.parser")
-            .find("head")
-            .find("meta")
-            .get("content")[5:]
+        await self.__session_login.get(
+            "https://esia.gosuslugi.ru/aas/oauth2/config"
         )
+        login_response = await self.__session_login.post(
+            "https://esia.gosuslugi.ru/aas/oauth2/api/login",
+            json={
+                "login": username,
+                "password": password
+            }
+        )
+        login_json = await login_response.json()
+        action = login_json.get("action", None)
+
+        if action == "FILL_MFA":
+            TOKEN = (
+                await self.__session_login.get(
+                    (
+                        await (
+                            await self.__session_login.post(
+                                "https://esia.gosuslugi.ru/aas/oauth2/api/login/promo-mfa/fill-mfa?decision=false"
+                            )
+                        ).json()
+                    ).get("redirect_url", "")
+                )
+            ).cookies.get("aupd_token", None).value
+            await self.__session_login.close()
+            return TOKEN
+        elif action == "ENTER_MFA":
+            return False
+        else:
+            await self.__session_login.close()
+            
+            if (failed := login_json.get("failed", None)):
+                raise APIError(
+                    url="ESIA_LOGIN_URL",
+                    status_code=login_response.status,
+                    error_type=failed,
+                    description="Login error.",
+                    details=login_json
+                )
+    
+    
+    async def esia_enter_MFA(self, code: int) -> str:
+        """2 этап получения API-TOKEN прохождение MFA: ввод кода"""
+        enter_mfa = await self.__session_login.post(
+            f"https://esia.gosuslugi.ru/aas/oauth2/api/login/totp/verify?code={code}"
+        )
+        enter_mfa_json = await enter_mfa.json()
+        if (failed := enter_mfa_json.get("failed", None)):
+            await self.__session_login.close()
+            raise APIError(
+                url="ESIA_ENTER_MFA_URL",
+                status_code=enter_mfa.status,
+                error_type=failed,
+                description="Enter MFA error.",
+                details=enter_mfa_json
+            )
+        
+        TOKEN = (
+            await self.__session_login.get(
+                enter_mfa_json.get("redirect_url", "")
+            )
+        ).cookies.get("aupd_token", None).value
+        await self.__session_login.close()
+        return TOKEN
+
 
     async def get_user_info(self) -> UserInfo:
         """Получите информацию о пользователе."""
