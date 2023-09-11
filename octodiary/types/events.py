@@ -76,8 +76,8 @@ class ResponseItem(Type):
     url: Any
     subject_id: Optional[int]
     subject_name: Optional[str]
-    room_name: str
-    room_number: str
+    room_name: Optional[str] = None
+    room_number: Optional[str] = None
     replaced: Optional[bool]
     replaced_teacher_id: Optional[int]
     esz_field_id: Any
@@ -96,8 +96,8 @@ class ResponseItem(Type):
     external_activities_type: Any
     address: Any
     place_comment: Any
-    building_id: int
-    building_name: str
+    building_id: Optional[int] = None
+    building_name: Optional[str] = None
     city_building_name: Any
     cancelled: Optional[bool]
     is_missed_lesson: Optional[bool]
