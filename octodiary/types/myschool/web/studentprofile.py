@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from .model import Type
+from ...model import Type
 
 
 class ClassUnit(Type):

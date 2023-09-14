@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from .model import Type
+from ...model import Type
 from .persondata import EveryType
 
 

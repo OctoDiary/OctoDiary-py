@@ -1,16 +1,17 @@
-from octodiary import __version__
+import re
+
 from setuptools import find_packages, setup
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-with open("requirements.txt", "r", encoding="utf-8") as fr:
-    requirements = fr.read().splitlines()
+with open("octodiary/__init__.py", encoding="utf-8") as f:
+    version = re.findall(r"__version__ = \"(.+)\"", f.read())[0]
 
 
 setup(
     name="octodiary",
-    version=__version__,
+    version=version,
     author="OctoDiary",
     description="Python библиотека для использования API: МЭШ / Моя Школа.",
     long_description=long_description,
@@ -18,7 +19,11 @@ setup(
     url="https://github.com/OctoDiary/OctoDiary-py",
     packages=find_packages(),
     license="Apache License 2.0",
-    install_requires=requirements,
+    install_requires=[
+        "pydantic",
+        "aiohttp",
+        "fake_useragent"
+    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.9",
@@ -34,5 +39,6 @@ setup(
         "Source": "https://github.com/OctoDiary/OctoDiary-py",
         "Organization": "https://github.com/OctoDiary",
         "Telegram-Channel": "https://t.me/OctoDiary",
+        "Example": "https://github.com/OctoDiary/OctoDiary-py/blob/main/Example.md",
     }
 )

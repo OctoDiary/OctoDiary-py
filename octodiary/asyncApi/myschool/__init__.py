@@ -1,5 +1,7 @@
-from .web import WebAsyncApi
+from .mobile import AsyncMobileAPI
+from .web import AsyncWebAPI
 
 __all__ = [
-    "WebAsyncApi",
+    "AsyncWebAPI",
+    "AsyncMobileAPI",
 ]

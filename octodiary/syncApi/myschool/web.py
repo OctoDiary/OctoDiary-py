@@ -24,7 +24,7 @@ from octodiary.types import (
 from ..base import SyncBaseApi
 
 
-class WebSyncApi(SyncBaseApi):
+class SyncWebAPI(SyncBaseApi):
     """
     Sync Web API class wrapper.
     """

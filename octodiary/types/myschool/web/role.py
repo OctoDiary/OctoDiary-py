@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from .model import Type
+from ...model import Type
 
 
 class Role(Type):

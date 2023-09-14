@@ -1,6 +1,6 @@
 from typing import Optional
 
-from .model import Type
+from ...model import Type
 
 
 class AcademicYear(Type):

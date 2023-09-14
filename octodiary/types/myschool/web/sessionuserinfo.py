@@ -1,7 +1,7 @@
 from datetime import date
 from typing import List, Optional
 
-from .model import Type
+from ...model import Type
 
 
 class Profile(Type):

@@ -1,4 +1,4 @@
-from .model import Type
+from ...model import Type
 from typing import List, Any, Optional
 
 

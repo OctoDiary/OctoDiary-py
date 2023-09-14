@@ -6,7 +6,7 @@ from aiohttp import ClientSession
 from aiohttp.cookiejar import CookieJar
 
 from octodiary.exceptions import APIError
-from octodiary.types import (
+from octodiary.types.myschool.web import (
     AcademicYear,
     EventsResponse,
     PersonData,
@@ -24,7 +24,7 @@ from octodiary.types import (
 from ..base import AsyncBaseApi
 
 
-class WebAsyncApi(AsyncBaseApi):
+class AsyncWebAPI(AsyncBaseApi):
     """
     Async Web API class wrapper.
     """

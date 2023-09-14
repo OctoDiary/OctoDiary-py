@@ -1,5 +1,8 @@
-from .web import WebSyncApi
+from .web import SyncWebAPI
+from .mobile import SyncMobileAPI
+
 
 __all__ = [
-    "WebSyncApi"
+    "SyncWebAPI",
+    "SyncMobileAPI",
 ]

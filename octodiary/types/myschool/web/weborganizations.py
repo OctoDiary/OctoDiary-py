@@ -2,7 +2,7 @@ from typing import Any, List, Optional
 
 from pydantic import Field
 
-from .model import Type
+from ...model import Type
 
 
 class ConstituentEntityItem(Type):
