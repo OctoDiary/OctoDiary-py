@@ -6,7 +6,7 @@ from typing import List, Union
 from requests.utils import dict_from_cookiejar
 
 from octodiary.exceptions import APIError
-from octodiary.types import (
+from octodiary.types.myschool.web import (
     AcademicYear,
     EventsResponse,
     PersonData,
