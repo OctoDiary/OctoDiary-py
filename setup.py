@@ -39,6 +39,6 @@ setup(
         "Source": "https://github.com/OctoDiary/OctoDiary-py",
         "Organization": "https://github.com/OctoDiary",
         "Telegram-Channel": "https://t.me/OctoDiary",
-        "Example": "https://github.com/OctoDiary/OctoDiary-py/blob/main/Example.md",
+        "Examples": "https://github.com/OctoDiary/OctoDiary-py/blob/main/Examples.md",
     }
 )
