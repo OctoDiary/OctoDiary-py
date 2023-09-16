@@ -10,11 +10,11 @@ class ConstituentEntityItem(Type):
 
 
 class Entity(Type):
-    signature_date: str
-    global_id: int
-    system_object_id: str
-    full_name: str
-    short_name: str
+    signature_date: Optional[str] = None
+    global_id: Optional[int] = None
+    system_object_id: Optional[str] = None
+    full_name: Optional[str] = None
+    short_name: Optional[str] = None
     constituent_entity: List[ConstituentEntityItem]
 
 

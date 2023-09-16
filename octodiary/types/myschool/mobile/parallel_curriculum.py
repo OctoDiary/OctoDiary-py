@@ -3,12 +3,12 @@ from typing import List, Optional, Any
 
 
 class Subject(Type):
-    subject_name: str
-    subject_id: int
-    total_hours: int
-    passed_hours: int
-    max_hours_per_week: int
-    min_hours_per_week: int
+    subject_name: Optional[str] = None
+    subject_id: Optional[int] = None
+    total_hours: Optional[int] = None
+    passed_hours: Optional[int] = None
+    max_hours_per_week: Optional[int] = None
+    min_hours_per_week: Optional[int] = None
 
 
 class Section(Type):

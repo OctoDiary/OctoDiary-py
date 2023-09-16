@@ -3,23 +3,23 @@ from typing import Any, List, Optional
 
 
 class PayloadItem(Type):
-    id: int
-    value: str
-    values: Any
-    comment: str
-    weight: int
-    point_date: Any
-    control_form_name: str
-    comment_exists: bool
-    created_at: str
-    updated_at: str
-    criteria: Any
-    date: str
-    subject_name: str
-    subject_id: int
-    is_exam: bool
-    is_point: bool
-    original_grade_system_type: str
+    id: Optional[int]
+    value: Optional[str]
+    values: Optional[Any]
+    comment: Optional[str]
+    weight: Optional[int]
+    point_date: Optional[Any]
+    control_form_name: Optional[str]
+    comment_exists: Optional[bool]
+    created_at: Optional[str]
+    updated_at: Optional[str]
+    criteria: Optional[Any]
+    date: Optional[str]
+    subject_name: Optional[str]
+    subject_id: Optional[int]
+    is_exam: Optional[bool]
+    is_point: Optional[bool]
+    original_grade_system_type: Optional[str]
 
 
 class Marks(Type):

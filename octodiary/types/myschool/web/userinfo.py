@@ -3,28 +3,28 @@ from typing import Any, List, Optional
 from pydantic import Field
 
 class Info(Type):
-    birthdate: str
-    mail: Any
-    gender: str
-    trusted: bool
+    birthdate: Optional[str] = None
+    mail: Optional[Any] = None
+    gender: Optional[str] = None
+    trusted: Optional[bool] = None
     first_name: str = Field(..., alias='FirstName')
-    mobile: Any
-    guid: str
-    failed: bool
+    mobile: Optional[Any] = None
+    guid: Optional[str] = None
+    failed: Optional[bool] = None
     last_name: str = Field(..., alias='LastName')
-    error: Any
+    error: Optional[Any] = None
     middle_name: str = Field(..., alias='MiddleName')
-    snils: str
+    snils: Optional[str] = None
 
 
 class Subsystem(Type):
-    id: int
-    title: str
-    url: str
-    mnemonic: str
-    description: str
-    is_mobile: bool
-    sort_order: int
+    id: Optional[int] = None
+    title: Optional[str] = None
+    url: Optional[str] = None
+    mnemonic: Optional[str] = None
+    description: Optional[str] = None
+    is_mobile: Optional[bool] = None
+    sort_order: Optional[int] = None
 
 
 class Role(Type):
