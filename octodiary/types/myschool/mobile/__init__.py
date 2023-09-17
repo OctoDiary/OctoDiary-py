@@ -12,6 +12,7 @@ from .person_data import PersonData
 from .user_childrens import UserChildrens
 from .notifications import Notification
 from .subject_marks_for_subject import SubjectMarksForSubject
+from .lesson_schedule_items import LessonScheduleItems
 
 
 __all__ = [
@@ -29,4 +30,5 @@ __all__ = [
     "UserChildrens",
     "Notification",
     "SubjectMarksForSubject",
+    "LessonScheduleItems",
 ]
