@@ -21,6 +21,7 @@ from octodiary.types.myschool.mobile import (
     SubjectMarksForSubject,
     UserChildrens,
     UserSettings,
+    LessonScheduleItems
 )
 
 from ..base import AsyncBaseApi
@@ -443,4 +444,26 @@ class AsyncMobileAPI(AsyncBaseApi):
             }
         )
 
-    
+    async def get_lesson_schedule_items(
+        self,
+        profile_id: int,
+        lesson_id: int,
+        student_id: int,
+        type: str = "PLAN"
+    ) -> LessonScheduleItems:
+        """
+        Получить информацию об уроке
+        """
+        return await self.get(
+            url=f"https://api.myschool.mosreg.ru/family/mobile/v1/lesson_schedule_items/{lesson_id}",
+            params={
+                "student_id": student_id,
+                "type": type
+            },
+            custom_headers={
+                "x-mes-subsystem": "familymp",
+                "client-type": "diary-mobile",
+                "profile-id": profile_id
+            },
+            model=LessonScheduleItems
+        )
