@@ -133,7 +133,7 @@ class Details(Type):
 class LessonScheduleItems(Type):
     id: Optional[int] = None
     plan_id: Optional[int] = None
-    date: Optional[datetime] = None
+    date: Optional[str] = None
     begin_time: Optional[str] = None
     begin_utc: Optional[datetime] = None
     end_time: Optional[str] = None
