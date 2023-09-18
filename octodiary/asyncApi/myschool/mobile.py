@@ -16,7 +16,7 @@ import re
 from datetime import date
 from typing import List, Union
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientResponse
 from aiohttp.cookiejar import CookieJar
 
 from octodiary.exceptions import APIError
@@ -46,7 +46,54 @@ class AsyncMobileAPI(AsyncBaseApi):
     Async Mobile API class wrapper.
     """
 
-
+    async def handle_action(self, response: ClientResponse, action: str = None, failed: str = None) -> str | bool:
+        match action or failed:
+            case None:
+                return None
+            case "FILL_MFA":
+                token_request = (
+                    await self.__session_login.get(
+                        (
+                            await (
+                                await self.__session_login.post(
+                                    "https://esia.gosuslugi.ru/aas/oauth2/api/login/promo-mfa/fill-mfa?decision=false"
+                                )
+                            ).json()
+                        ).get("redirect_url", "")
+                    )
+                )
+                await self.__session_login.close()
+                return token_request.cookies.get("aupd_token", None).value
+            case "DONE":
+                token_request = (
+                    await self.__session_login.get(
+                        (await response.json()).get("redirect_url", "")
+                    )
+                )
+                await self.__session_login.close()
+                return token_request.cookies.get("aupd_token", None).value
+            case "GRANT_SCOPE_ACCESS":
+                response = await self.__session_login.post(
+                    url="https://esia.gosuslugi.ru/aas/oauth2/api/scope/allow"
+                )
+                resp_json = response.json()
+                return await self.handle_action(
+                    response=response,
+                    action=resp_json.get("action", None),
+                    failed=resp_json.get("failed", None)
+                )
+            case "ENTER_MFA":
+                return False
+            case other_action_or_failed:
+                await self.__session_login.close()
+                raise APIError(
+                    url="ESIA_AUTHORIZATION",
+                    status_code=response.status,
+                    error_type=other_action_or_failed,
+                    description="Esia Authorization error.",
+                    details=(await response.json())
+                )
+    
     async def esia_login(self, username: str, password: str) -> Union[str, bool]:
         """
         Вход через ЕСИА(Госуслуги) и получение API-TOKEN.
@@ -75,35 +122,11 @@ class AsyncMobileAPI(AsyncBaseApi):
             }
         )
         login_json = await login_response.json()
-        action = login_json.get("action", None)
-
-        if action == "FILL_MFA":
-            TOKEN = (
-                await self.__session_login.get(
-                    (
-                        await (
-                            await self.__session_login.post(
-                                "https://esia.gosuslugi.ru/aas/oauth2/api/login/promo-mfa/fill-mfa?decision=false"
-                            )
-                        ).json()
-                    ).get("redirect_url", "")
-                )
-            ).cookies.get("aupd_token", None).value
-            await self.__session_login.close()
-            return TOKEN
-        elif action == "ENTER_MFA":
-            return False
-        else:
-            await self.__session_login.close()
-            
-            if (failed := login_json.get("failed", None)):
-                raise APIError(
-                    url="ESIA_LOGIN_URL",
-                    status_code=login_response.status,
-                    error_type=failed,
-                    description="Login error.",
-                    details=login_json
-                )
+        return await self.handle_action(
+            response=login_response,
+            action=login_json.get("action", None),
+            failed=login_json.get("failed", None)
+        )
     
     async def esia_enter_MFA(self, code: int) -> str:
         """2 этап получения API-TOKEN прохождение MFA: ввод кода"""
@@ -111,29 +134,11 @@ class AsyncMobileAPI(AsyncBaseApi):
             f"https://esia.gosuslugi.ru/aas/oauth2/api/login/totp/verify?code={code}"
         )
         enter_mfa_json = await enter_mfa.json()
-        if (
-            (
-                failed := enter_mfa_json.get("failed", None)
-            ) or (
-                failed := enter_mfa_json.get("action", None)
-            ) == "SOLVE_ANOMALY_REACTION"
-        ):
-            await self.__session_login.close()
-            raise APIError(
-                url="ESIA_ENTER_MFA_URL",
-                status_code=enter_mfa.status,
-                error_type=failed,
-                description="Enter MFA error.",
-                details=enter_mfa_json
-            )
-        
-        TOKEN = (
-            await self.__session_login.get(
-                enter_mfa_json.get("redirect_url", "")
-            )
-        ).cookies.get("aupd_token", None).value
-        await self.__session_login.close()
-        return TOKEN
+        return await self.handle_action(
+            response=enter_mfa,
+            action=enter_mfa_json.get("action", None),
+            failed=enter_mfa_json.get("failed", None)
+        )
     
     async def get_users_profile_info(self) -> List[ProfileInfo]:
         """

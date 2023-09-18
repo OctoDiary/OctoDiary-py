@@ -17,6 +17,7 @@ import re
 from datetime import date
 from typing import List, Union
 
+from requests import Response
 from requests.utils import dict_from_cookiejar
 
 from octodiary.exceptions import APIError
@@ -43,6 +44,55 @@ class SyncWebAPI(SyncBaseApi):
     Sync Web API class wrapper.
     """
 
+    def handle_action(self, response: Response, action: str = None, failed: str = None) -> str | bool:
+        match action or failed:
+            case None:
+                return None
+            case "FILL_MFA":
+                return (
+                    dict_from_cookiejar(
+                        self.__login_request(
+                            self.session.get(
+                                self.__login_request(
+                                    self.session.post(
+                                        "https://esia.gosuslugi.ru/aas/oauth2/api/login/promo-mfa/fill-mfa?decision=false",
+                                        cookies=self.__cookies
+                                    )
+                                ).json().get("redirect_url", "")
+                            )
+                        ).cookies
+                    )["aupd_token"]
+                )
+            case "DONE":
+                return dict_from_cookiejar(
+                    self.__login_request(self.session.get(response.json().get("redirect_url", ""))).cookies
+                )["aupd_token"]
+            case "GRANT_SCOPE_ACCESS":
+                response = self.__login_request(
+                    self.session.post(
+                        url="https://esia.gosuslugi.ru/aas/oauth2/api/scope/allow"
+                    )
+                )
+                resp_json = response.json()
+                return self.handle_action(
+                    response=response,
+                    action=resp_json.get("action", None),
+                    failed=resp_json.get("failed", None)
+                )
+            case "ENTER_MFA":
+                return False
+            case other_action_or_failed:
+                raise APIError(
+                    url="ESIA_AUTHORIZATION",
+                    status_code=response.status,
+                    error_type=other_action_or_failed,
+                    description="Esia Authorization error.",
+                    details=response.json()
+                )
+    
+    def __login_request(self, response):
+        self._check_response(response)
+        return response
     
     def esia_login(self, username: str, password: str) -> Union[str, bool]:
         """
@@ -50,21 +100,18 @@ class SyncWebAPI(SyncBaseApi):
         Если вы получили ``False``, значит у вас стоит MFA,
         используйте метод ``.esia_enter_MFA(code=<CODE>)``, где <CODE> - код MFA.
         """
-        def request(response):
-            self._check_response(response)
-            return response
         
         self.__cookies = cookielib.CookieJar()
 
-        one: str = request(
+        one: str = self.__login_request(
             self.session.get(
                 "https://authedu.mosreg.ru/v3/auth/esia/login",
                 allow_redirects=False
             )
         ).text
-        request(self.session.get(re.findall(r"0\;url\=(.*?)\">", one)[0], cookies=self.__cookies))
-        request(self.session.get("https://esia.gosuslugi.ru/aas/oauth2/config", cookies=self.__cookies))
-        login = request(self.session.post(
+        self.__login_request(self.session.get(re.findall(r"0\;url\=(.*?)\">", one)[0], cookies=self.__cookies))
+        self.__login_request(self.session.get("https://esia.gosuslugi.ru/aas/oauth2/config", cookies=self.__cookies))
+        login = self.__login_request(self.session.post(
             "https://esia.gosuslugi.ru/aas/oauth2/api/login",
             json={
                 "login": username,
@@ -73,64 +120,27 @@ class SyncWebAPI(SyncBaseApi):
             cookies=self.__cookies
         ))
         login_json = login.json()
-        action = login_json.get("action", None)
-        if action == "FILL_MFA":
-            return (
-                dict_from_cookiejar(
-                    request(
-                        self.session.get(
-                            request(
-                                self.session.post(
-                                    "https://esia.gosuslugi.ru/aas/oauth2/api/login/promo-mfa/fill-mfa?decision=false",
-                                    cookies=self.__cookies
-                                )
-                            ).json().get("redirect_url", "")
-                        )
-                    ).cookies
-                )["aupd_token"]
-            )
-        elif action == "ENTER_MFA":
-            return False
-        elif (failed := login_json.get("failed", None)):
-            raise APIError(
-                url="ESIA_LOGIN_URL",
-                status_code=login.status_code,
-                error_type=failed,
-                description="Login error.",
-                details=login_json
-            )
+        return self.handle_action(
+            response=login,
+            action=login_json.get("action", None),
+            failed=login_json.get("failed", None)
+        )
     
     
     def esia_enter_MFA(self, code: int) -> str:
         """2 этап получения API-TOKEN прохождение MFA: ввод кода"""
-        def request(response):
-            self._check_response(response)
-            return response
-        enter_mfa = request(
+        enter_mfa = self.__login_request(
             self.session.post(
                 f"https://esia.gosuslugi.ru/aas/oauth2/api/login/totp/verify?code={code}",
                 cookies=self.__cookies
             )
         )
         enter_mfa_json = enter_mfa.json()
-        if (
-            (
-                failed := enter_mfa_json.get("failed", None)
-            ) or (
-                failed := enter_mfa_json.get("action", None)
-            ) == "SOLVE_ANOMALY_REACTION"
-        ):
-            raise APIError(
-                url="ESIA_ENTER_MFA_URL",
-                status_code=enter_mfa.status,
-                error_type=failed,
-                description="Enter MFA error.",
-                details=enter_mfa_json
-            )
-        
-        return dict_from_cookiejar(
-            request(self.session.get(enter_mfa_json.get("redirect_url", ""))).cookies
-        )["aupd_token"]
+        return self.handle_action(
+            response=enter_mfa,
+            action=enter_mfa_json.get("action", None),
+            failed=enter_mfa_json.get("failed", None)
+        )
     
 
     def get_user_info(self) -> UserInfo:
