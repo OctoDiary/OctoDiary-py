@@ -1,89 +1,103 @@
-from typing import Any, List
+#    ____       _        _____  _                  
+#   / __ \     | |      |  __ \(_)                 
+#  | |  | | ___| |_ ___ | |  | |_  __ _ _ __ _   _ 
+#  | |  | |/ __| __/ _ \| |  | | |/ _` | '__| | | |
+#  | |__| | (__| || (_) | |__| | | (_| | |  | |_| |
+#   \____/ \___|\__\___/|_____/|_|\__,_|_|   \__, |
+#                                             __/ |
+#                                            |___/ 
+# 
+#                 © Copyright 2023
+#        🔒 Licensed under the MIT License
+#        https://opensource.org/licenses/MIT
+#           https://github.com/OctoDiary
+
+from typing import Any, List, Optional
 
 from ...model import Type
 
 
 class ClassUnit(Type):
-    id: int
-    class_level_id: int
-    name: str
-    home_based: bool
+    id: Optional[int] = None
+    class_level_id: Optional[int] = None
+    name: Optional[str] = None
+    home_based: Optional[bool] = None
 
 
 class Curricula(Type):
-    id: int
-    name: str
-    class_level_id: Any
+    id: Optional[int] = None
+    name: Optional[str] = None
+    class_level_id: Optional[Any] = None
 
 
 class Mentor(Type):
-    id: int
-    name: str
+    id: Optional[int] = None
+    name: Optional[str] = None
 
 
 class Parent(Type):
-    id: int
-    user_id: int
-    type: str
-    gusoev_login: str
-    name: str
-    phone_number_ezd: Any
-    email_ezd: Any
-    phone_number: str
-    email: str
-    snils: Any
-    last_sign_in_at: Any
-    hidden: bool
+    id: Optional[int] = None
+    user_id: Optional[int] = None
+    type: Optional[str] = None
+    gusoev_login: Optional[str] = None
+    name: Optional[str] = None
+    phone_number_ezd: Optional[Any] = None
+    email_ezd: Optional[Any] = None
+    phone_number: Optional[str] = None
+    email: Optional[str] = None
+    snils: Optional[Any] = None
+    last_sign_in_at: Optional[Any] = None
+    hidden: Optional[bool] = None
 
 
 class StudentProfile(Type):
-    id: int
-    created_at: str
-    updated_at: str
-    deleted_at: Any
-    person_id: str
-    transferred: bool
-    school_id: int
-    user_id: int
-    study_mode_id: int
-    user_name: str
-    short_name: str
-    last_name: Any
-    first_name: Any
-    middle_name: Any
-    change_password_required: bool
-    birth_date: str
-    enlisted_on: Any
-    gusoev_login: str
-    age: int
-    sex: str
-    deleted: bool
-    email: Any
-    phone_number: Any
-    email_ezd: Any
-    phone_number_ezd: Any
-    class_unit: ClassUnit
-    previously_class_unit: Any
-    curricula: Curricula
-    non_attendance: int
-    mentors: List[Mentor]
-    ispp_account: Any
-    previously_profile_id: Any
-    student_viewed: Any
-    migration_date: Any
-    education_level: Any
-    class_level: Any
-    snils: Any
-    last_sign_in_at: Any
-    groups: List
-    parents: List[Parent]
-    marks: List
-    final_marks: List
-    attendances: List
-    lesson_comments: List
-    home_based_periods: List
-    subjects: List
-    ae_attendances: List
-    ec_attendances: List
-    assignments: List
-    left_on_registry: Any
+    id: Optional[int] = None
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+    deleted_at: Optional[Any] = None
+    person_id: Optional[str] = None
+    transferred: Optional[bool] = None
+    school_id: Optional[int] = None
+    user_id: Optional[int] = None
+    study_mode_id: Optional[int] = None
+    user_name: Optional[str] = None
+    short_name: Optional[str] = None
+    last_name: Optional[Any] = None
+    first_name: Optional[Any] = None
+    middle_name: Optional[Any] = None
+    change_password_required: Optional[bool] = None
+    birth_date: Optional[str] = None
+    enlisted_on: Optional[Any] = None
+    gusoev_login: Optional[str] = None
+    age: Optional[int] = None
+    sex: Optional[str] = None
+    deleted: Optional[bool] = None
+    email: Optional[Any] = None
+    phone_number: Optional[Any] = None
+    email_ezd: Optional[Any] = None
+    phone_number_ezd: Optional[Any] = None
+    class_unit: Optional[ClassUnit] = None
+    previously_class_unit: Optional[Any] = None
+    curricula: Optional[Curricula] = None
+    non_attendance: Optional[int] = None
+    mentors: Optional[List[Mentor]] = []
+    ispp_account: Optional[Any] = None
+    previously_profile_id: Optional[Any] = None
+    student_viewed: Optional[Any] = None
+    migration_date: Optional[Any] = None
+    education_level: Optional[Any] = None
+    class_level: Optional[Any] = None
+    snils: Optional[Any] = None
+    last_sign_in_at: Optional[Any] = None
+    groups: Optional[List] = []
+    parents: Optional[List[Parent]] = []
+    marks: Optional[List] = []
+    final_marks: Optional[List] = []
+    attendances: Optional[List] = []
+    lesson_comments: Optional[List] = []
+    home_based_periods: Optional[List] = []
+    subjects: Optional[List] = []
+    ae_attendances: Optional[List] = []
+    ec_attendances: Optional[List] = []
+    assignments: Optional[List] = []
+    left_on_registry: Optional[Any] = None

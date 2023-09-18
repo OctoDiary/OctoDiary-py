@@ -1,3 +1,17 @@
+#    ____       _        _____  _                  
+#   / __ \     | |      |  __ \(_)                 
+#  | |  | | ___| |_ ___ | |  | |_  __ _ _ __ _   _ 
+#  | |  | |/ __| __/ _ \| |  | | |/ _` | '__| | | |
+#  | |__| | (__| || (_) | |__| | | (_| | |  | |_| |
+#   \____/ \___|\__\___/|_____/|_|\__,_|_|   \__, |
+#                                             __/ |
+#                                            |___/ 
+# 
+#                 © Copyright 2023
+#        🔒 Licensed under the MIT License
+#        https://opensource.org/licenses/MIT
+#           https://github.com/OctoDiary
+
 import json
 import typing
 from datetime import datetime
@@ -37,11 +51,3 @@ class EveryType(Type):
     name: str
     actual_from: str
     actual_to: str
-
-
-class AutoNameEnum(Enum):
-    def _generate_next_value_(self, *args):
-        return self.lower()
-
-    def __repr__(self):
-        return f"octodiary.types.{self}"

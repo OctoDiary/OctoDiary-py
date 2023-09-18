@@ -1,3 +1,17 @@
+#    ____       _        _____  _                  
+#   / __ \     | |      |  __ \(_)                 
+#  | |  | | ___| |_ ___ | |  | |_  __ _ _ __ _   _ 
+#  | |  | |/ __| __/ _ \| |  | | |/ _` | '__| | | |
+#  | |__| | (__| || (_) | |__| | | (_| | |  | |_| |
+#   \____/ \___|\__\___/|_____/|_|\__,_|_|   \__, |
+#                                             __/ |
+#                                            |___/ 
+# 
+#                 © Copyright 2023
+#        🔒 Licensed under the MIT License
+#        https://opensource.org/licenses/MIT
+#           https://github.com/OctoDiary
+
 from datetime import date
 from typing import List, Optional
 
@@ -5,19 +19,19 @@ from ...model import Type
 
 
 class Profile(Type):
-    id: int
-    type: str
-    roles: List
-    user_id: int
-    agree_pers_data: bool
-    subject_ids: List
+    id: Optional[int] = None
+    type: Optional[str] = None
+    roles: Optional[List] = []
+    user_id: Optional[int] = None
+    agree_pers_data: Optional[bool] = None
+    subject_ids: Optional[List] = []
 
 
 class SessionUserInfo(Type):
     id: Optional[int] = None
     email: Optional[str] = None
     snils: Optional[str] = None
-    profiles: Optional[List[Profile]] = None
+    profiles: Optional[List[Profile]] = []
     guid: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None

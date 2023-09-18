@@ -1,45 +1,61 @@
-from ...model import Type
-from typing import List, Any
+#    ____       _        _____  _                  
+#   / __ \     | |      |  __ \(_)                 
+#  | |  | | ___| |_ ___ | |  | |_  __ _ _ __ _   _ 
+#  | |  | |/ __| __/ _ \| |  | | |/ _` | '__| | | |
+#  | |__| | (__| || (_) | |__| | | (_| | |  | |_| |
+#   \____/ \___|\__\___/|_____/|_|\__,_|_|   \__, |
+#                                             __/ |
+#                                            |___/ 
+# 
+#                 © Copyright 2023
+#        🔒 Licensed under the MIT License
+#        https://opensource.org/licenses/MIT
+#           https://github.com/OctoDiary
+
+from typing import Any, List, Optional
+
 from pydantic import Field
+
+from ...model import Type
 
 
 class Profile(Type):
-    id: int
-    type: str
-    roles: List
-    user_id: int
-    children_profile_ids: List[int]
+    id: Optional[int] = None
+    type: Optional[str] = None
+    roles: Optional[List] = []
+    user_id: Optional[int] = None
+    children_profile_ids: Optional[List[int]] = []
 
 
 class User(Type):
-    id: int
-    email: str
-    sex: str
-    password: Any
-    locked: bool
+    id: Optional[int] = None
+    email: Optional[str] = None
+    sex: Optional[str] = None
+    password: Optional[Any] = None
+    locked: Optional[bool] = None
     temporary_locked: bool = Field(..., alias='temporaryLocked')
     full_count: int = Field(..., alias='fullCount')
     sessions_count: int = Field(..., alias='sessionsCount')
     updated_at: Any = Field(..., alias='updatedAt')
-    profiles: List[Profile]
-    captcha: Any
-    hidden: bool
-    gusoev_login: str
-    first_name: str
-    last_name: str
-    middle_name: str
-    date_of_birth: str
-    phone_number: str
-    mrko_user_id: Any
-    sms_notify_message: Any
-    email_notify_message: Any
-    ekis_key: Any
-    change_password_required: Any
-    snils: str
-    guid: Any
-    is_hidden: bool
-    locked_by_user_id: int
-    lock_datetime: Any
-    phone_number_ezd: str
-    email_ezd: Any
-    last_sign_in_at: Any
+    profiles: Optional[List[Profile]] = []
+    captcha: Optional[Any] = None
+    hidden: Optional[bool] = None
+    gusoev_login: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    middle_name: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    phone_number: Optional[str] = None
+    mrko_user_id: Optional[Any] = None
+    sms_notify_message: Optional[Any] = None
+    email_notify_message: Optional[Any] = None
+    ekis_key: Optional[Any] = None
+    change_password_required: Optional[Any] = None
+    snils: Optional[str] = None
+    guid: Optional[Any] = None
+    is_hidden: Optional[bool] = None
+    locked_by_user_id: Optional[int] = None
+    lock_datetime: Optional[Any] = None
+    phone_number_ezd: Optional[str] = None
+    email_ezd: Optional[Any] = None
+    last_sign_in_at: Optional[Any] = None

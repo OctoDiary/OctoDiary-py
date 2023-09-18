@@ -1,11 +1,29 @@
-from datetime import date as Date, datetime
+#    ____       _        _____  _                  
+#   / __ \     | |      |  __ \(_)                 
+#  | |  | | ___| |_ ___ | |  | |_  __ _ _ __ _   _ 
+#  | |  | |/ __| __/ _ \| |  | | |/ _` | '__| | | |
+#  | |__| | (__| || (_) | |__| | | (_| | |  | |_| |
+#   \____/ \___|\__\___/|_____/|_|\__,_|_|   \__, |
+#                                             __/ |
+#                                            |___/ 
+# 
+#                 © Copyright 2023
+#        🔒 Licensed under the MIT License
+#        https://opensource.org/licenses/MIT
+#           https://github.com/OctoDiary
+
+from datetime import date as Date
+from datetime import datetime
 from typing import Optional, TypeVar, Union
-from octodiary.exceptions import APIError
+
 import requests
 from fake_useragent.fake import UserAgent
+
+from octodiary.exceptions import APIError
 from octodiary.types import Type
 
 _type = TypeVar("_type")
+
 
 class SyncBaseApi:
     """
