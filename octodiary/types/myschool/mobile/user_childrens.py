@@ -1,205 +1,206 @@
+import datetime
 from ...model import Type, EveryType
 from pydantic import Field
-from typing import List, Any
+from typing import List, Any, Optional
 
 
 class Contact(Type):
-    data: str
-    type: Type
-    is_deleted: Any
+    data: Optional[str] = None
+    type: EveryType
+    is_deleted: Optional[Any] = None
 
 
 class Parallel(Type):
-    id: int
-    name: str
+    id: Optional[int] = None
+    name: Optional[str] = None
 
 
 class Class(Type):
-    id: int
-    uid: str
-    name: str
-    organization_id: int
-    open_at: int
-    close_at: Any
+    id: Optional[int] = None
+    uid: Optional[str] = None
+    name: Optional[str] = None
+    organization_id: Optional[int] = None
+    open_at: Optional[datetime.datetime | datetime.date] = None
+    close_at: Optional[datetime.datetime | datetime.date] = None
     parallel: Parallel
 
 
 class EducationItem(Type):
-    id: int
-    person_id: str
-    organization_id: int
+    id: Optional[int] = None
+    person_id: Optional[str] = None
+    organization_id: Optional[int] = None
     actual_from: float
-    actual_to: int
-    training_begin_at: str
-    training_end_at: str
+    actual_to: Optional[int] = None
+    training_begin_at: Optional[datetime.datetime | datetime.date] = None
+    training_end_at: Optional[datetime.datetime | datetime.date] = None
     service_type: EveryType
     class_: Class = Field(..., alias='class')
 
 
 class Contact1(Type):
-    id: int
-    person_id: str
-    actual_from: str
-    actual_to: str
-    created_by: str
-    updated_by: Any
-    created_at: str
-    updated_at: Any
-    type_id: int
-    data: str
-    default: bool
+    id: Optional[int] = None
+    person_id: Optional[str] = None
+    actual_from: Optional[datetime.datetime | datetime.date] = None
+    actual_to: Optional[datetime.datetime | datetime.date] = None
+    created_by: Optional[str] = None
+    updated_by: Optional[Any] = None
+    created_at: Optional[datetime.datetime | datetime.date] = None
+    updated_at: Optional[datetime.datetime | datetime.date] = None
+    type_id: Optional[int] = None
+    data: Optional[str] = None
+    default: Optional[bool] = None
     type: EveryType
-    validation_state_id: int
-    validated_at: Any
-    validation_errors: Any
+    validation_state_id: Optional[int] = None
+    validated_at: Optional[datetime.datetime | datetime.date] = None
+    validation_errors: Optional[Any] = None
 
 
 class AgentPerson1(Type):
-    id: int
-    person_id: str
-    merged_to: Any
-    lastname: str
-    firstname: str
-    patronymic: str
-    birthdate: str
-    birthplace: Any
-    snils: str
-    gender_id: int
-    citizenship_id: Any
-    validation_state_id: int
-    validated_at: Any
-    actual_from: str
-    actual_to: str
-    created_by: str
-    updated_by: Any
-    created_at: str
-    updated_at: Any
-    addresses: Any
-    documents: Any
-    contacts: Any
-    preventions: Any
-    categories: Any
-    agents: Any
-    children: Any
-    education: Any
-    citizenship: Any
-    validation_errors: Any
+    id: Optional[int] = None
+    person_id: Optional[str] = None
+    merged_to: Optional[Any] = None
+    lastname: Optional[str] = None
+    firstname: Optional[str] = None
+    patronymic: Optional[str] = None
+    birthdate: Optional[str] = None
+    birthplace: Optional[Any] = None
+    snils: Optional[str] = None
+    gender_id: Optional[int] = None
+    citizenship_id: Optional[Any] = None
+    validation_state_id: Optional[int] = None
+    validated_at: Optional[Any] = None
+    actual_from: Optional[str] = None
+    actual_to: Optional[str] = None
+    created_by: Optional[str] = None
+    updated_by: Optional[Any] = None
+    created_at: Optional[datetime.datetime | datetime.date] = None
+    updated_at: Optional[datetime.datetime | datetime.date] = None
+    addresses: Optional[Any] = None
+    documents: Optional[Any] = None
+    contacts: Optional[Any] = None
+    preventions: Optional[Any] = None
+    categories: Optional[Any] = None
+    agents: Optional[Any] = None
+    children: Optional[Any] = None
+    education: Optional[Any] = None
+    citizenship: Optional[Any] = None
+    validation_errors: Optional[Any] = None
 
 
 class Child(Type):
-    id: int
-    person_id: str
-    agent_person_id: str
-    agent_type_id: int
-    validation_state_id: int
-    validated_at: Any
-    data: Any
-    actual_from: str
-    actual_to: str
-    created_by: str
-    updated_by: Any
-    created_at: str
-    updated_at: Any
+    id: Optional[int] = None
+    person_id: Optional[str] = None
+    agent_person_id: Optional[str] = None
+    agent_type_id: Optional[int] = None
+    validation_state_id: Optional[int] = None
+    validated_at: Optional[datetime.datetime | datetime.date] = None
+    data: Optional[Any] = None
+    actual_from: Optional[datetime.datetime | datetime.date] = None
+    actual_to: Optional[datetime.datetime | datetime.date] = None
+    created_by: Optional[str] = None
+    updated_by: Optional[Any] = None
+    created_at: Optional[datetime.datetime | datetime.date] = None
+    updated_at: Optional[datetime.datetime | datetime.date] = None
     agent_type: EveryType
     agent_person: AgentPerson1
-    validation_errors: Any
+    validation_errors: Optional[Any] = None
 
 
 class AgentPerson(Type):
-    id: int
-    person_id: str
-    merged_to: Any
-    lastname: str
-    firstname: str
-    patronymic: str
-    birthdate: str
-    birthplace: Any
-    snils: str
-    gender_id: int
-    citizenship_id: Any
-    validation_state_id: int
-    validated_at: Any
-    actual_from: str
-    actual_to: str
-    created_by: str
-    updated_by: Any
-    created_at: str
-    updated_at: Any
-    addresses: Any
-    documents: Any
+    id: Optional[int] = None
+    person_id: Optional[str] = None
+    merged_to: Optional[Any] = None
+    lastname: Optional[str] = None
+    firstname: Optional[str] = None
+    patronymic: Optional[str] = None
+    birthdate: Optional[datetime.date] = None
+    birthplace: Optional[Any] = None
+    snils: Optional[str] = None
+    gender_id: Optional[int] = None
+    citizenship_id: Optional[Any] = None
+    validation_state_id: Optional[int] = None
+    validated_at: Optional[Any] = None
+    actual_from: Optional[str] = None
+    actual_to: Optional[str] = None
+    created_by: Optional[str] = None
+    updated_by: Optional[Any] = None
+    created_at: Optional[datetime.datetime | datetime.date] = None
+    updated_at: Optional[datetime.datetime | datetime.date] = None
+    addresses: Optional[Any] = None
+    documents: Optional[Any] = None
     contacts: List[Contact1]
-    preventions: Any
-    categories: Any
-    agents: Any
+    preventions: Optional[Any] = None
+    categories: Optional[Any] = None
+    agents: Optional[Any] = None
     children: List[Child]
-    education: Any
-    citizenship: Any
-    validation_errors: Any
+    education: Optional[Any] = None
+    citizenship: Optional[Any] = None
+    validation_errors: Optional[Any] = None
 
 
 class Agent(Type):
-    id: int
-    person_id: str
-    agent_person_id: str
-    agent_type_id: int
-    validation_state_id: int
-    validated_at: Any
-    data: Any
-    actual_from: str
-    actual_to: str
-    created_by: str
-    updated_by: Any
-    created_at: str
-    updated_at: Any
+    id: Optional[int] = None
+    person_id: Optional[str] = None
+    agent_person_id: Optional[str] = None
+    agent_type_id: Optional[int] = None
+    validation_state_id: Optional[int] = None
+    validated_at: Optional[datetime.datetime | datetime.date] = None
+    data: Optional[Any] = None
+    actual_from: Optional[str] = None
+    actual_to: Optional[str] = None
+    created_by: Optional[str] = None
+    updated_by: Optional[Any] = None
+    created_at: Optional[datetime.datetime | datetime.date] = None
+    updated_at: Optional[datetime.datetime | datetime.date] = None
     agent_type: EveryType
     agent_person: AgentPerson
-    validation_errors: Any
+    validation_errors: Optional[Any] = None
 
 
 class Category(Type):
-    category_id: int
+    category_id: Optional[int] = None
 
 
 class Entity(Type):
-    id: int
-    obrId: int
-    login: Any
-    ssoId: Any
-    staffId: Any
-    firstname: str
-    lastname: str
-    patronymic: str
-    lastLogged: Any
-    organizations: Any
-    source: Any
-    activeStudent: bool
+    id: Optional[int] = None
+    obrId: Optional[int] = None
+    login: Optional[Any] = None
+    ssoId: Optional[Any] = None
+    staffId: Optional[Any] = None
+    firstname: Optional[str] = None
+    lastname: Optional[str] = None
+    patronymic: Optional[str] = None
+    lastLogged: Optional[Any] = None
+    organizations: Optional[Any] = None
+    source: Optional[Any] = None
+    activeStudent: Optional[bool] = None
     emails: List[str]
     phones: List[str]
-    active: Any
-    regionalStudent: bool
-    regionalEmploee: bool
-    person_id: str
+    active: Optional[Any] = None
+    regionalStudent: Optional[bool] = None
+    regionalEmploee: Optional[bool] = None
+    person_id: Optional[str] = None
     contacts: List[Contact]
     education: List[EducationItem]
     agents: List[Agent]
-    agent_person: Any
+    agent_person: Optional[Any] = None
     categories: List[Category]
-    children: Any
-    snils: str
-    validation_state_id: int
-    date: Any
-    birthdate: str
-    gender: str
-    created_at: str
-    role_group: Any
-    region_code: Any
-    actual_from: Any
-    actual_to: Any
+    children: Optional[Any] = None
+    snils: Optional[str] = None
+    validation_state_id: Optional[int] = None
+    date: Optional[datetime.date] = None
+    birthdate: Optional[datetime.date] = None
+    gender: Optional[str] = None
+    created_at: Optional[datetime.datetime | datetime.date] = None
+    role_group: Optional[Any] = None
+    region_code: Optional[Any] = None
+    actual_from: Optional[Any] = None
+    actual_to: Optional[Any] = None
 
 
 class UserChildrens(Type):
-    page: int
-    size: int
-    totalSize: int
-    parentCategories: Any
+    page: Optional[int] = None
+    size: Optional[int] = None
+    totalSize: Optional[int] = None
+    parentCategories: Optional[Any] = None
     entities: List[Entity]

@@ -1,68 +1,69 @@
+import datetime
 from ...model import Type
 from typing import List, Optional, Any
 
 
 class Path(Type):
-    value: int
-    remain: int
-    weight: int
+    value: Optional[int] = None
+    remain: Optional[int] = None
+    weight: Optional[int] = None
 
 
 class TargetItem(Type):
-    value: int
-    remain: int
+    value: Optional[int] = None
+    remain: Optional[int] = None
     round: Optional[str]
-    paths: List[Path]
+    paths: Optional[List[Path]] = []
 
 
 class Grade(Type):
-    origin: str
-    five: int
-    hundred: int
+    origin: Optional[str] = None
+    five: Optional[int] = None
+    hundred: Optional[int] = None
 
 
 class Value(Type):
-    name: Any
-    grade: Grade
-    grade_system_id: Any
-    grade_system_type: str
+    name: Optional[Any] = None
+    grade: Optional[Grade] = None
+    grade_system_id: Optional[Any] = None
+    grade_system_type: Optional[str] = None
 
 
 class Criterion(Type):
-    name: Any
-    value: str
+    name: Optional[Any] = None
+    value: Optional[str] = None
 
 
 class Mark(Type):
-    id: int
-    value: str
-    values: List[Value]
-    comment: str
-    weight: int
-    point_date: Any
-    control_form_name: str
-    comment_exists: bool
-    created_at: Any
-    updated_at: Any
-    criteria: List[Criterion]
-    date: str
-    is_exam: bool
-    is_point: bool
-    original_grade_system_type: str
+    id: Optional[int] = None
+    value: Optional[str] = None
+    values: Optional[List[Value]] = []
+    comment: Optional[str] = None
+    weight: Optional[int] = None
+    point_date: Optional[datetime.datetime | datetime.date] = None
+    control_form_name: Optional[str] = None
+    comment_exists: Optional[bool] = None
+    created_at: Optional[datetime.datetime | datetime.date] = None
+    updated_at: Optional[datetime.datetime | datetime.date] = None
+    criteria: Optional[List[Criterion]] = []
+    date: Optional[str] = None
+    is_exam: Optional[bool] = None
+    is_point: Optional[bool] = None
+    original_grade_system_type: Optional[str] = None
 
 
 class PayloadItem(Type):
     average: Optional[str]
-    dynamic: str
+    dynamic: Optional[str] = None
     period: Optional[str]
     count: Optional[int]
     target: Optional[TargetItem]
     marks: Optional[List[Mark]]
     start: Optional[str]
     end: Optional[str]
-    subject_name: str
-    subject_id: int
-    fixed_value: Any
+    subject_name: Optional[str] = None
+    subject_id: Optional[int] = None
+    fixed_value: Optional[Any] = None
 
 
 class ShortSubjectMarks(Type):

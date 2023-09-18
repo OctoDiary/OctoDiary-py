@@ -3,9 +3,9 @@ from typing import Optional
 
 
 class Theme(Type):
-    type: str
-    is_automatic: bool
-    color_pattern: str
+    type: Optional[str] = None
+    is_automatic: Optional[bool] = None
+    color_pattern: Optional[str] = None
 
 
 class UserSettings(Type):

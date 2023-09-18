@@ -7,16 +7,16 @@ from ...model import Type
 
 
 class Material(Type):
-    count_execute: int
-    count_learn: int
+    count_execute: Optional[int] = None
+    count_learn: Optional[int] = None
 
 
 class Entry(Type):
-    homework_entry_id: int
+    homework_entry_id: Optional[int] = None
     date_assigned_on: date
     date_prepared_for: date
     description: str
-    duration: int
+    duration: Optional[int] = None
     materials: Optional[str]
     attachment_ids: List
     attachments: List
@@ -24,8 +24,8 @@ class Entry(Type):
 
 
 class HomeworkItem(Type):
-    presence_status_id: int
-    total_count: int
+    presence_status_id: Optional[int] = None
+    total_count: Optional[int] = None
     execute_count: Optional[int]
     descriptions: Optional[List[str]]
     link_types: Any
@@ -45,7 +45,7 @@ class Material1(Type):
 
 
 class ResponseItem(Type):
-    id: int
+    id: Optional[int] = None
     author_id: Any
     title: Optional[str]
     description: Optional[str]

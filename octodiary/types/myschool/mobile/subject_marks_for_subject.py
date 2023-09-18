@@ -1,48 +1,49 @@
+import datetime
 from ...model import Type
 from typing import Optional, List, Any
 
 
 class Mark(Type):
-    id: int
-    value: str
-    values: Any
-    comment: str
-    weight: int
-    point_date: Any
-    control_form_name: str
-    comment_exists: bool
-    created_at: Any
-    updated_at: Any
-    criteria: Any
-    date: str
-    is_exam: bool
-    is_point: bool
-    original_grade_system_type: str
+    id: Optional[int] = None
+    value: Optional[str] = None
+    values: Optional[Any] = None
+    comment: Optional[str] = None
+    weight: Optional[int] = None
+    point_date: Optional[datetime.datetime | datetime.date] = None
+    control_form_name: Optional[str] = None
+    comment_exists: Optional[bool] = None
+    created_at: Optional[datetime.datetime | datetime.date] = None
+    updated_at: Optional[datetime.datetime | datetime.date] = None
+    criteria: Optional[Any] = None
+    date: Optional[datetime.date] = None
+    is_exam: Optional[bool] = None
+    is_point: Optional[bool] = None
+    original_grade_system_type: Optional[str] = None
 
 
 class Path(Type):
-    value: int
-    remain: int
-    weight: int
+    value: Optional[int] = None
+    remain: Optional[int] = None
+    weight: Optional[int] = None
 
 
 class Target(Type):
-    value: int
-    remain: int
-    round: str
-    paths: List[Path]
+    value: Optional[int] = None
+    remain: Optional[int] = None
+    round: Optional[str] = None
+    paths: Optional[List[Path]] = []
 
 
 class Period(Type):
-    start: str
-    end: str
-    title: str
-    dynamic: str
-    value: str
-    marks: List[Mark]
-    count: int
-    target: Target
-    fixed_value: Any
+    start: Optional[datetime.datetime | datetime.date] = None
+    end: Optional[datetime.datetime | datetime.date] = None
+    title: Optional[str] = None
+    dynamic: Optional[str] = None
+    value: Optional[str] = None
+    marks: Optional[List[Mark]] = []
+    count: Optional[int] = None
+    target: Optional[Target] = None
+    fixed_value: Optional[Any] = None
 
 
 class SubjectMarksForSubject(Type):
