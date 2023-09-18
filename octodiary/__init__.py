@@ -12,7 +12,7 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 from . import asyncApi, syncApi, exceptions, types
 

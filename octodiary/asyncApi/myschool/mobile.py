@@ -76,7 +76,7 @@ class AsyncMobileAPI(AsyncBaseApi):
                 response = await self.__session_login.post(
                     url="https://esia.gosuslugi.ru/aas/oauth2/api/scope/allow"
                 )
-                resp_json = response.json()
+                resp_json = await response.json()
                 return await self.handle_action(
                     response=response,
                     action=resp_json.get("action", None),
