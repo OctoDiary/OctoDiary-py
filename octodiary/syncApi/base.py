@@ -159,7 +159,7 @@ class SyncBaseApi:
                         description=json_response.get("description", None),
                         details=json_response.get("details", None),
                     )
-            except:
+            except requests.exceptions.JSONDecodeError:
                 raise APIError(
                     url=str(response.url),
                     status_code=response.status_code,

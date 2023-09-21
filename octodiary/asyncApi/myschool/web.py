@@ -43,6 +43,31 @@ class AsyncWebAPI(AsyncBaseApi):
     Async Web API class wrapper.
     """
 
+    async def login(self, username: str, password: str) -> str:
+        """Авторизоваться и получить токен напрямую через обычный логин и пароль."""
+        return (
+            await self.get(
+                url="https://authedu.mosreg.ru/v3/auth/kauth/callback",
+                required_token=False, return_raw_response=True,
+                params={
+                    "code": (
+                        await self.post(
+                            url="https://authedu.mosreg.ru/lms/api/sessions",
+                            required_token=False,
+                            json={
+                                "login": username,
+                                "password_plain": password
+                            },
+                            model=SessionUserInfo,
+                            custom_headers={
+                                "Accept": "application/json"
+                            }
+                        )
+                    ).authentication_token
+                }
+            )
+        ).cookies.get("aupd_token").value
+
     async def handle_action(self, response: ClientResponse, action: str = None, failed: str = None) -> str | bool:
         match action or failed:
             case None:

@@ -12,6 +12,7 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
+from json import JSONDecodeError
 from typing import Optional
 
 import aiohttp
@@ -63,7 +64,7 @@ class AsyncBaseApi(SyncBaseApi):
                         description=json_response.get("description", None),
                         details=json_response.get("details", None),
                     )
-            except:
+            except JSONDecodeError:
                 raise APIError(
                     url=str(response.url),
                     status_code=response.status,

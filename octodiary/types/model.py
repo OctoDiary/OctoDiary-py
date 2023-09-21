@@ -14,7 +14,7 @@
 
 import json
 import typing
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 
 from pydantic import BaseModel
@@ -25,7 +25,7 @@ class Type(BaseModel):
     def __default__(type: "Type"):
         if isinstance(type, (bytes, typing.Match)):
             return repr(type)
-        elif isinstance(type, (Enum, datetime)):
+        elif isinstance(type, (Enum, datetime, date)):
             return str(type)
 
         return {

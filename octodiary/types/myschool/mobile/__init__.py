@@ -27,6 +27,8 @@ from .subject_marks_for_subject import SubjectMarksForSubject
 from .user_childrens import UserChildrens
 from .user_settings import UserSettings
 from .users_profile_info import ProfileInfo
+from .rating import RatingRankClass, RatingRankShort, RatingRankSubject
+
 
 __all__ = [
     "EventsResponse",
@@ -44,4 +46,7 @@ __all__ = [
     "Notification",
     "SubjectMarksForSubject",
     "LessonScheduleItems",
+    "RatingRankClass",
+    "RatingRankShort",
+    "RatingRankSubject"
 ]

@@ -44,6 +44,31 @@ class SyncWebAPI(SyncBaseApi):
     Sync Web API class wrapper.
     """
 
+    def login(self, username: str, password: str) -> str:
+        """Авторизоваться и получить токен напрямую через обычный логин и пароль."""
+        return (
+            self.get(
+                url="https://authedu.mosreg.ru/v3/auth/kauth/callback",
+                required_token=False, return_raw_response=True,
+                params={
+                    "code": (
+                        self.post(
+                            url="https://authedu.mosreg.ru/lms/api/sessions",
+                            required_token=False,
+                            json={
+                                "login": username,
+                                "password_plain": password
+                            },
+                            model=SessionUserInfo,
+                            custom_headers={
+                                "Accept": "application/json"
+                            }
+                        )
+                    ).authentication_token
+                }
+            )
+        ).cookies["aupd_token"]
+
     def handle_action(self, response: Response, action: str = None, failed: str = None) -> str | bool:
         match action or failed:
             case None:

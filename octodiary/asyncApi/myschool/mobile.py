@@ -36,7 +36,11 @@ from octodiary.types.myschool.mobile import (
     SubjectMarksForSubject,
     UserChildrens,
     UserSettings,
+    RatingRankClass,
+    RatingRankSubject,
+    RatingRankShort,
 )
+from octodiary.types.myschool.web import SessionUserInfo
 
 from ..base import AsyncBaseApi
 
@@ -45,6 +49,31 @@ class AsyncMobileAPI(AsyncBaseApi):
     """
     Async Mobile API class wrapper.
     """
+
+    async def login(self, username: str, password: str) -> str:
+        """Авторизоваться и получить токен напрямую через обычный логин и пароль."""
+        return (
+            await self.get(
+                url="https://authedu.mosreg.ru/v3/auth/kauth/callback",
+                required_token=False, return_raw_response=True,
+                params={
+                    "code": (
+                        await self.post(
+                            url="https://authedu.mosreg.ru/lms/api/sessions",
+                            required_token=False,
+                            json={
+                                "login": username,
+                                "password_plain": password
+                            },
+                            model=SessionUserInfo,
+                            custom_headers={
+                                "Accept": "application/json"
+                            }
+                        )
+                    ).authentication_token
+                }
+            )
+        ).cookies.get("aupd_token").value
 
     async def handle_action(self, response: ClientResponse, action: str = None, failed: str = None) -> str | bool:
         match action or failed:
@@ -492,3 +521,77 @@ class AsyncMobileAPI(AsyncBaseApi):
             },
             model=LessonScheduleItems
         )
+
+    async def get_rating_rank_class(
+        self,
+        profile_id: int,
+        person_id: str,
+        classUnitId: int,
+        date: date = None
+    ) -> list[RatingRankClass]:
+        """
+        Получить общий рейтинг класса
+        """
+        return await self.get(
+            url="https://authedu.mosreg.ru/api/ej/rating/v1/rank/class",
+            model=RatingRankClass, is_list=True,
+            custom_headers={
+                "x-mes-subsystem": "familymp",
+                "client-type": "diary-mobile",
+                "profile-id": profile_id
+            },
+            params={
+                "person_id": person_id,
+                "classUnitId": classUnitId,
+                "date": self.date_to_string(date)
+            }
+        )
+    
+    async def get_raging_rank_short(
+        self,
+        profile_id: int,
+        person_id: str,
+        begin_date: date,
+        end_date: date
+    ) -> list[RatingRankShort]:
+        """
+        Получить общий рейтинг класса
+        """
+        return await self.get(
+            url="https://authedu.mosreg.ru/api/ej/rating/v1/rank/class",
+            model=RatingRankShort, is_list=True,
+            custom_headers={
+                "x-mes-subsystem": "familymp",
+                "client-type": "diary-mobile",
+                "profile-id": profile_id
+            },
+            params={
+                "person_id": person_id,
+                "beginDate": self.date_to_string(begin_date),
+                "endDate": self.date_to_string(end_date),
+            }
+        )
+    
+    async def get_rating_rank_subjects(
+        self,
+        profile_id: int,
+        person_id: str,
+        date: date
+    ) -> list[RatingRankSubject]:
+        """
+        Получить рейтинг по предметам
+        """
+        return await self.get(
+            url="https://authedu.mosreg.ru/api/ej/rating/v1/rank/subject",
+            model=RatingRankSubject, is_list=True,
+            custom_headers={
+                "x-mes-subsystem": "familymp",
+                "client-type": "diary-mobile",
+                "profile-id": profile_id
+            },
+            params={
+                "personId": person_id,
+                "date": self.date_to_string(date),
+            }
+        )
+    
