@@ -5,8 +5,8 @@
 
 from typing import Any, Optional
 
-from ...model import Type
 from .persondata import EveryType
+from ...model import Type
 
 
 class UserContact(Type):

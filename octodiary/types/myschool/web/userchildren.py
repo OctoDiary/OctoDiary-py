@@ -7,8 +7,8 @@ from typing import Any, List, Optional
 
 from pydantic import Field
 
-from ...model import Type
 from .persondata import EveryType
+from ...model import Type
 
 
 class EntityContact(Type):

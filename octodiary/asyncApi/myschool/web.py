@@ -25,7 +25,6 @@ from octodiary.types.myschool.web import (
     WebFamilyProfile,
     WebOrganizations,
 )
-
 from ..base import AsyncBaseApi
 
 
@@ -115,7 +114,7 @@ class AsyncWebAPI(AsyncBaseApi):
                     description="Esia Authorization error.",
                     details=(await response.json())
                 )
-    
+
     async def esia_login(self, username: str, password: str) -> Union[str, bool]:
         """
         Вход через ЕСИА
@@ -154,7 +153,7 @@ class AsyncWebAPI(AsyncBaseApi):
             action=login_json.get("action", None),
             failed=login_json.get("failed", None)
         )
-    
+
     async def esia_enter_mfa(self, code: int) -> str:
         """
         Ввод кода МФА
@@ -174,7 +173,7 @@ class AsyncWebAPI(AsyncBaseApi):
             action=enter_mfa_json.get("action", None),
             failed=enter_mfa_json.get("failed", None)
         )
-    
+
     async def get_user_info(self) -> UserInfo:
         """
         Получить информацию о пользователе
@@ -183,7 +182,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get("https://authedu.mosreg.ru/v3/userinfo", model=UserInfo)
-    
+
     async def refresh_token(self, role_id: int = None, subsystem: int = None) -> str:
         """
         Обновить токен доступа
@@ -200,14 +199,14 @@ class AsyncWebAPI(AsyncBaseApi):
             params={"roleId": role_id, "subsystem": subsystem},
             return_raw_text=True
         )
-    
+
     async def get_system_messages(
-        self,
-        published: bool = True,
-        today: bool = True,
-        profile_id: int = None,
-        profile_type: str = None,
-        pid: int = None
+            self,
+            published: bool = True,
+            today: bool = True,
+            profile_id: int = None,
+            profile_type: str = None,
+            pid: int = None
     ) -> List:
         """
         Получить сообщения системы
@@ -232,7 +231,7 @@ class AsyncWebAPI(AsyncBaseApi):
             params={"pid": pid, "published": published, "today": today},
             return_json=True
         )
-    
+
     async def get_session_info(self) -> SessionUserInfo:
         """
         Получить информацию о пользователе
@@ -251,10 +250,10 @@ class AsyncWebAPI(AsyncBaseApi):
         )
 
     async def get_academic_years(
-        self,
-        profile_id: int = None,
-        profile_type: str = None,
-        pid: int = None
+            self,
+            profile_id: int = None,
+            profile_type: str = None,
+            pid: int = None
     ) -> List[AcademicYear]:
         """
         Получить учебные года
@@ -277,13 +276,13 @@ class AsyncWebAPI(AsyncBaseApi):
             model=AcademicYear,
             is_list=True,
         )
-    
+
     async def get_user(
-        self,
-        ids: Union[int, List[int]] = 1,
-        pid: int = None,
-        profile_id: int = None,
-        profile_type: str = None
+            self,
+            ids: Union[int, List[int]] = 1,
+            pid: int = None,
+            profile_id: int = None,
+            profile_type: str = None
     ) -> Union[User, List[User]]:
         """
         Получить информацию о пользователе(-ях)
@@ -310,15 +309,15 @@ class AsyncWebAPI(AsyncBaseApi):
                 "pid": pid,
             }
         )
-    
+
     async def get_student_profiles(
-        self,
-        academic_year_id: int = 0,
-        page: int = 1,
-        per_page: int = 50,
-        pid: int = None,
-        profile_id: int = None,
-        profile_type: str = None
+            self,
+            academic_year_id: int = 0,
+            page: int = 1,
+            per_page: int = 50,
+            pid: int = None,
+            profile_id: int = None,
+            profile_type: str = None
     ) -> Union[StudentProfile, List[StudentProfile]]:
         """
         Получить информацию об ученике(-ах)
@@ -351,10 +350,10 @@ class AsyncWebAPI(AsyncBaseApi):
         )
 
     async def get_family_web_profile(
-        self,
-        profile_id: int = None,
-        profile_type: str = None,
-        nocache: bool = True
+            self,
+            profile_id: int = None,
+            profile_type: str = None,
+            nocache: bool = True
     ) -> WebFamilyProfile:
         """
         TODO Описать метод
@@ -379,7 +378,7 @@ class AsyncWebAPI(AsyncBaseApi):
                 "nocache": nocache
             }
         )
-    
+
     async def get_person_data(self, person_id: str) -> PersonData:
         """
         Получить полную информацию о пользователе
@@ -397,7 +396,7 @@ class AsyncWebAPI(AsyncBaseApi):
             },
             model=PersonData,
         )
-    
+
     async def get_all_roles_global(self) -> List[Role]:
         """
         Получить список всех ролей
@@ -409,14 +408,14 @@ class AsyncWebAPI(AsyncBaseApi):
             "https://authedu.mosreg.ru/v1/roles/allGlobal/",
             model=Role, is_list=True, required_token=False
         )
-    
+
     async def get_events(
-        self,
-        person_id: str,
-        mes_role: str,
-        begin_date: date = None,
-        end_date: date = None,
-        expand: str = "marks,homework,absence_reason_id,health_status,nonattendance_reason_id"
+            self,
+            person_id: str,
+            mes_role: str,
+            begin_date: date = None,
+            end_date: date = None,
+            expand: str = "marks,homework,absence_reason_id,health_status,nonattendance_reason_id"
     ) -> EventsResponse:
         """
         Получить события (их расписание)
@@ -445,7 +444,7 @@ class AsyncWebAPI(AsyncBaseApi):
                 "expand": expand,
             }
         )
-    
+
     async def get_children(self, sso_id: str, timeout: int = 10) -> UserChildren:
         """
         Получить полную информацию о всех детях
@@ -483,11 +482,11 @@ class AsyncWebAPI(AsyncBaseApi):
         )
 
     async def get_organisations(
-        self,
-        organization_id: int,
-        page: int = 1,
-        size: int = 10,
-        timeout: int = 20,
+            self,
+            organization_id: int,
+            page: int = 1,
+            size: int = 10,
+            timeout: int = 20,
     ) -> WebOrganizations:
         """
         Получить информацию о всех организациях
@@ -511,5 +510,5 @@ class AsyncWebAPI(AsyncBaseApi):
                 "timeout": timeout,
             }
         )
-    
+
     get_organizations = get_organisations

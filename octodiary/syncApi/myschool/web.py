@@ -26,7 +26,6 @@ from octodiary.types.myschool.web import (
     WebFamilyProfile,
     WebOrganizations,
 )
-
 from ..base import SyncBaseApi
 
 
