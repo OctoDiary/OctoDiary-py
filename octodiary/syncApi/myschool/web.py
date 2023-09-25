@@ -20,7 +20,7 @@ from octodiary.types.myschool.web import (
     SessionUserInfo,
     StudentProfile,
     User,
-    UserChildrens,
+    UserChildren,
     UserContact,
     UserInfo,
     WebFamilyProfile,
@@ -36,7 +36,16 @@ class SyncWebAPI(SyncBaseApi):
     """
 
     def login(self, username: str, password: str) -> str:
-        """Авторизоваться и получить токен напрямую через обычный логин и пароль."""
+        """
+        Авторизация по логину и паролю дневника
+        Args:
+            username: Логин
+            password: Пароль
+
+        Returns:
+            Токен доступа
+
+        """
         return (
             self.get(
                 url="https://authedu.mosreg.ru/v3/auth/kauth/callback",
@@ -113,9 +122,14 @@ class SyncWebAPI(SyncBaseApi):
 
     def esia_login(self, username: str, password: str) -> Union[str, bool]:
         """
-        Вход через ЕСИА(Госуслуги) и получение API-TOKEN.
-        Если вы получили ``False``, значит у вас стоит MFA,
-        используйте метод ``.esia_enter_MFA(code=<CODE>)``, где <CODE> - код MFA.
+        Вход через ЕСИА
+        Args:
+            username: логин Госуслуг (телефон, почта, СНИЛС)
+            password: пароль Госуслуг
+
+        Returns:
+            Токен доступа или False (-> esia_enter_mfa())
+
         """
 
         self.__cookies = cookielib.CookieJar()
@@ -144,7 +158,15 @@ class SyncWebAPI(SyncBaseApi):
         )
 
     def esia_enter_mfa(self, code: int) -> str:
-        """2 этап получения API-TOKEN прохождение MFA: ввод кода"""
+        """
+        Ввод кода МФА
+        Args:
+            code: код МФА (аутентификатор или смс)
+
+        Returns:
+            Токен доступа
+
+        """
         enter_mfa = self.__login_request(
             self.session.post(
                 f"https://esia.gosuslugi.ru/aas/oauth2/api/login/totp/verify?code={code}",
@@ -159,11 +181,25 @@ class SyncWebAPI(SyncBaseApi):
         )
 
     def get_user_info(self) -> UserInfo:
-        """Получите информацию о пользователе."""
+        """
+        Получить информацию о пользователе
+        Returns:
+            UserInfo
+
+        """
         return self.get("https://authedu.mosreg.ru/v3/userinfo", model=UserInfo)
 
     def refresh_token(self, role_id: int = None, subsystem: int = None) -> str:
-        """Обновите токен."""
+        """
+        Обновить токен доступа
+        Args:
+            role_id: int
+            subsystem: int
+
+        Returns:
+            Новый токен доступ
+
+        """
         return self.get(
             "https://authedu.mosreg.ru/v2/token/refresh",
             params={"roleId": role_id, "subsystem": subsystem},
@@ -178,7 +214,19 @@ class SyncWebAPI(SyncBaseApi):
             profile_type: str = None,
             pid: int = None
     ) -> List:
-        """Получите сообщения системы."""
+        """
+        Получить сообщения системы
+        Args:
+            published: bool
+            today: bool
+            profile_id: int
+            profile_type: str
+            pid: int
+
+        Returns:
+            Список сообщений
+
+        """
         return self.get(
             "https://myschool.mosreg.ru/acl/api/system_messages",
             custom_headers={
@@ -191,7 +239,12 @@ class SyncWebAPI(SyncBaseApi):
         )
 
     def get_session_info(self) -> SessionUserInfo:
-        """Получите информацию о пользователе аккаунта."""
+        """
+        Получить информацию о пользователе
+        Returns:
+            SessionUserInfo
+
+        """
         return self.post(
             "https://myschool.mosreg.ru/lms/api/sessions",
             {
@@ -208,7 +261,17 @@ class SyncWebAPI(SyncBaseApi):
             profile_type: str = None,
             pid: int = None
     ) -> List[AcademicYear]:
-        """Получите список учебных годов."""
+        """
+        Получить учебные года
+        Args:
+            profile_id: int
+            profile_type: str
+            pid: int
+
+        Returns:
+            Список учебных лет
+
+        """
         return self.get(
             "https://myschool.mosreg.ru/core/api/academic_years",
             {
@@ -227,7 +290,18 @@ class SyncWebAPI(SyncBaseApi):
             profile_id: int = None,
             profile_type: str = None
     ) -> Union[User, List[User]]:
-        """Получите информацию о пользователе или пользователях."""
+        """
+        Получить информацию о пользователе(-ях)
+        Args:
+            ids: int или List[int]
+            pid: int
+            profile_id: int
+            profile_type: str
+
+        Returns:
+            User или List[User]
+
+        """
         return self.get(
             "https://myschool.mosreg.ru/acl/api/users",
             {
@@ -251,7 +325,20 @@ class SyncWebAPI(SyncBaseApi):
             profile_id: int = None,
             profile_type: str = None
     ) -> Union[StudentProfile, List[StudentProfile]]:
-        """Получите информацию о студенте или студентах."""
+        """
+        Получить информацию об ученике(-ах)
+        Args:
+            academic_year_id: int
+            page: int
+            per_page: int
+            pid: int
+            profile_id: int
+            profile_type: str
+
+        Returns:
+            StudentProfile или List[StudentProfile]
+
+        """
         return self.get(
             "https://myschool.mosreg.ru/core/api/student_profiles",
             {
@@ -274,7 +361,17 @@ class SyncWebAPI(SyncBaseApi):
             profile_type: str = None,
             nocache: bool = True
     ) -> WebFamilyProfile:
-        """Получите информацию о студенте или студентах."""
+        """
+        TODO Описать метод
+        Args:
+            profile_id: int
+            profile_type: str
+            nocache: bool
+
+        Returns:
+            WebFamilyProfile
+
+        """
         return self.get(
             "https://authedu.mosreg.ru/api/family/web/v1/profile",
             {
@@ -289,7 +386,15 @@ class SyncWebAPI(SyncBaseApi):
         )
 
     def get_person_data(self, person_id: str) -> PersonData:
-        """Получите полную подробную информацию о пользователе."""
+        """
+        Получить полную информацию о пользователе
+        Args:
+            person_id: str
+
+        Returns:
+            PersonData
+
+        """
         return self.get(
             f"https://authedu.mosreg.ru/api/persondata/v1/persons/{person_id}",
             {
@@ -299,7 +404,12 @@ class SyncWebAPI(SyncBaseApi):
         )
 
     def get_all_roles_global(self) -> List[Role]:
-        """Получите список всех ролей."""
+        """
+        Получить список всех ролей
+        Returns:
+            List[Role]
+
+        """
         return self.get(
             "https://authedu.mosreg.ru/v1/roles/allGlobal/",
             model=Role, is_list=True, required_token=False
@@ -313,7 +423,19 @@ class SyncWebAPI(SyncBaseApi):
             end_date: date = None,
             expand: str = "marks,homework,absence_reason_id,health_status,nonattendance_reason_id"
     ) -> EventsResponse:
-        """Получите расписание."""
+        """
+        Получить события (их расписание)
+        Args:
+            person_id: ID персоны
+            mes_role: Роль
+            begin_date: Начало расписания
+            end_date: Окончание расписания
+            expand: Дополнительные поля
+
+        Returns:
+            EventsResponse
+
+        """
         return self.get(
             "https://authedu.mosreg.ru/api/eventcalendar/v1/api/events",
             {
@@ -329,11 +451,20 @@ class SyncWebAPI(SyncBaseApi):
             }
         )
 
-    def get_children(self, sso_id: str, timeout: int = 10) -> UserChildrens:
-        """Получите подробную информацию о всех детей."""
+    def get_children(self, sso_id: str, timeout: int = 10) -> UserChildren:
+        """
+        Получить полную информацию о всех детях
+        Args:
+            sso_id: str
+            timeout: int
+
+        Returns:
+            UserChildren
+
+        """
         return self.get(
             "https://authedu.mosreg.ru/v1/user/childrens",
-            model=UserChildrens,
+            model=UserChildren,
             params={
                 "sso_id": sso_id,
                 "timeout": timeout
@@ -341,7 +472,12 @@ class SyncWebAPI(SyncBaseApi):
         )
 
     def get_user_contacts(self) -> List[UserContact]:
-        """Получите контактные данные о пользователе."""
+        """
+        Получить контактные данные пользователя
+        Returns:
+            List[UserContact]
+
+        """
         return self.get(
             "https://authedu.mosreg.ru/v1/user/contacts",
             model=UserContact,
@@ -358,7 +494,18 @@ class SyncWebAPI(SyncBaseApi):
             size: int = 10,
             timeout: int = 20,
     ) -> WebOrganizations:
-        """Получите информацию о всех организациях."""
+        """
+        Получить информацию о всех организациях
+        Args:
+            organization_id: int
+            page: int
+            size: int
+            timeout: int
+
+        Returns:
+            WebOrganizations
+
+        """
         return self.get(
             "https://authedu.mosreg.ru/v1/nsi/organisations",
             model=WebOrganizations,

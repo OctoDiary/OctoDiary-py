@@ -205,7 +205,7 @@ class Entity(Type):
     actual_to: Optional[Any] = None
 
 
-class UserChildrens(Type):
+class UserChildren(Type):
     page: Optional[int] = None
     size: Optional[int] = None
     total_size: Optional[int] = Field(None, alias='totalSize')
