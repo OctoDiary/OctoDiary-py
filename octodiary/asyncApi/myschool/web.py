@@ -97,7 +97,7 @@ class AsyncWebAPI(AsyncBaseApi):
                 )
             case "ENTER_MFA":
                 return False
-            case other_action_or_failed: # SOLVE_ANOMALY_REACTION  INVALID_TTP  INVALID_OTP
+            case other_action_or_failed:  # SOLVE_ANOMALY_REACTION  INVALID_TTP  INVALID_OTP
                 await self.__session_login.close()
                 raise APIError(
                     url="ESIA_AUTHORIZATION",
@@ -141,7 +141,7 @@ class AsyncWebAPI(AsyncBaseApi):
             failed=login_json.get("failed", None)
         )
     
-    async def esia_enter_MFA(self, code: int) -> str:
+    async def esia_enter_mfa(self, code: int) -> str:
         """2 этап получения API-TOKEN прохождение MFA: ввод кода"""
         enter_mfa = await self.__session_login.post(
             f"https://esia.gosuslugi.ru/aas/oauth2/api/login/totp/verify?code={code}"
@@ -157,11 +157,11 @@ class AsyncWebAPI(AsyncBaseApi):
         """Получите информацию о пользователе."""
         return await self.get("https://authedu.mosreg.ru/v3/userinfo", model=UserInfo)
     
-    async def refresh_token(self, roleId: int = None, subsystem: int = None) -> str:
+    async def refresh_token(self, role_id: int = None, subsystem: int = None) -> str:
         """Обновите токен."""
         return await self.get(
             "https://authedu.mosreg.ru/v2/token/refresh",
-            params={"roleId": roleId, "subsystem": subsystem},
+            params={"roleId": role_id, "subsystem": subsystem},
             return_raw_text=True
         )
     
@@ -191,7 +191,7 @@ class AsyncWebAPI(AsyncBaseApi):
             "https://myschool.mosreg.ru/lms/api/sessions",
             {
                 "auth_token": self.token,
-                "Content-Type":"application/json;charset=utf-8",
+                "Content-Type": "application/json;charset=utf-8",
             },
             json={"auth_token": self.token},
             model=SessionUserInfo,
@@ -324,7 +324,7 @@ class AsyncWebAPI(AsyncBaseApi):
             }
         )
     
-    async def get_childrens(self, sso_id: str, timeout: int = 10) -> UserChildrens:
+    async def get_children(self, sso_id: str, timeout: int = 10) -> UserChildrens:
         """Получите подробную информацию о всех детей."""
         return await self.get(
             "https://authedu.mosreg.ru/v1/user/childrens",
