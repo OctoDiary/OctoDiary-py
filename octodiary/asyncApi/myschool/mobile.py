@@ -32,7 +32,6 @@ from octodiary.types.myschool.mobile import (
     RatingRankShort,
 )
 from octodiary.types.myschool.web import SessionUserInfo
-
 from ..base import AsyncBaseApi
 
 
@@ -113,7 +112,7 @@ class AsyncMobileAPI(AsyncBaseApi):
                     description="Esia Authorization error.",
                     details=(await response.json())
                 )
-    
+
     async def esia_login(self, username: str, password: str) -> Union[str, bool]:
         """
         Вход через ЕСИА(Госуслуги) и получение API-TOKEN.
@@ -147,7 +146,7 @@ class AsyncMobileAPI(AsyncBaseApi):
             action=login_json.get("action", None),
             failed=login_json.get("failed", None)
         )
-    
+
     async def esia_enter_MFA(self, code: int) -> str:
         """2 этап получения API-TOKEN прохождение MFA: ввод кода"""
         enter_mfa = await self.__session_login.post(
@@ -159,7 +158,7 @@ class AsyncMobileAPI(AsyncBaseApi):
             action=enter_mfa_json.get("action", None),
             failed=enter_mfa_json.get("failed", None)
         )
-    
+
     async def get_users_profile_info(self) -> List[ProfileInfo]:
         """
         Получить информацию о профиле
@@ -186,12 +185,12 @@ class AsyncMobileAPI(AsyncBaseApi):
             },
             model=FamilyProfile
         )
-    
+
     async def get_user_settings_app(
-        self,
-        profile_id: int,
-        name: str = "settings_group_v1",
-        subsystem_id: int = 1
+            self,
+            profile_id: int,
+            name: str = "settings_group_v1",
+            subsystem_id: int = 1
     ) -> UserSettings:
         """
         Получить настройки приложения пользователя
@@ -211,11 +210,11 @@ class AsyncMobileAPI(AsyncBaseApi):
         )
 
     async def edit_user_settings_app(
-        self,
-        settings: UserSettings,
-        profile_id: int,
-        name: str = "settings_group_v1",
-        subsystem_id: int = 1,
+            self,
+            settings: UserSettings,
+            profile_id: int,
+            name: str = "settings_group_v1",
+            subsystem_id: int = 1,
     ):
         """
         Изменить настройки приложения пользователя
@@ -234,14 +233,14 @@ class AsyncMobileAPI(AsyncBaseApi):
             json=settings.model_dump(),
             return_raw_text=True
         )
-    
+
     async def get_events(
-        self,
-        person_id: str,
-        mes_role: str,
-        begin_date: date = None,
-        end_date: date = None,
-        expand: str = "marks,homework,absence_reason_id,health_status,nonattendance_reason_id"
+            self,
+            person_id: str,
+            mes_role: str,
+            begin_date: date = None,
+            end_date: date = None,
+            expand: str = "marks,homework,absence_reason_id,health_status,nonattendance_reason_id"
     ) -> EventsResponse:
         """Получите расписание."""
         return await self.get(
@@ -261,13 +260,13 @@ class AsyncMobileAPI(AsyncBaseApi):
         )
 
     async def get_homeworks_short(
-        self,
-        student_id: int,
-        profile_id: int,
-        from_date: date,
-        to_date: date,
-        sort_column: str = "date",
-        sort_direction: str = "asc",
+            self,
+            student_id: int,
+            profile_id: int,
+            from_date: date,
+            to_date: date,
+            sort_column: str = "date",
+            sort_direction: str = "asc",
     ) -> ShortHomeworks:
         """
         Получить список домашних заданий
@@ -290,11 +289,11 @@ class AsyncMobileAPI(AsyncBaseApi):
         )
 
     async def get_marks(
-        self,
-        student_id: int,
-        profile_id: int,
-        from_date: date,
-        to_date: date
+            self,
+            student_id: int,
+            profile_id: int,
+            from_date: date,
+            to_date: date
     ) -> Marks:
         """
         Получить оценки
@@ -313,13 +312,13 @@ class AsyncMobileAPI(AsyncBaseApi):
             },
             model=Marks
         )
-    
+
     async def get_periods_schedules(
-        self,
-        student_id: int,
-        profile_id: int,
-        from_date: date,
-        to_date: date
+            self,
+            student_id: int,
+            profile_id: int,
+            from_date: date,
+            to_date: date
     ) -> List[PeriodSchedule]:
         """
         Получить информацию о всех днях с from_date по to_date:
@@ -341,11 +340,11 @@ class AsyncMobileAPI(AsyncBaseApi):
             model=PeriodSchedule,
             is_list=True
         )
-    
+
     async def get_subject_marks_short(
-        self,
-        student_id: int,
-        profile_id: int,
+            self,
+            student_id: int,
+            profile_id: int,
     ) -> ShortSubjectMarks:
         """
         Получить оценки и ср.баллы по предметам за период времени
@@ -364,9 +363,9 @@ class AsyncMobileAPI(AsyncBaseApi):
         )
 
     async def get_subjects(
-        self,
-        student_id: int,
-        profile_id: int,
+            self,
+            student_id: int,
+            profile_id: int,
     ) -> List[SubjectList]:
         """
         Получить список предметов
@@ -386,9 +385,9 @@ class AsyncMobileAPI(AsyncBaseApi):
         )
 
     async def get_programs_parallel_curriculum(
-        self,
-        profile_id: int,
-        student_id: int,
+            self,
+            profile_id: int,
+            student_id: int,
     ) -> ParallelCurriculum:
         """
         Получить программу обучения по текущему классу
@@ -408,9 +407,9 @@ class AsyncMobileAPI(AsyncBaseApi):
         )
 
     async def get_person_data(
-        self,
-        person_id: str,
-        profile_id: int,
+            self,
+            person_id: str,
+            profile_id: int,
     ) -> PersonData:
         """
         Получить подробную информацию о пользователе
@@ -424,10 +423,10 @@ class AsyncMobileAPI(AsyncBaseApi):
                 "profile-id": profile_id,
             }
         )
-    
+
     async def get_user_childrens(
-        self,
-        person_id: str,
+            self,
+            person_id: str,
     ) -> UserChildrens:
         """
         Получить детей пользователя
@@ -445,9 +444,9 @@ class AsyncMobileAPI(AsyncBaseApi):
         )
 
     async def get_notifications(
-        self,
-        student_id: int,
-        profile_id: int
+            self,
+            student_id: int,
+            profile_id: int
     ) -> List[Notification]:
         """
         Получить уведомления пользователя
@@ -467,10 +466,10 @@ class AsyncMobileAPI(AsyncBaseApi):
         )
 
     async def get_subject_marks_for_subject(
-        self,
-        student_id: int,
-        profile_id: int,
-        subject_name: int
+            self,
+            student_id: int,
+            profile_id: int,
+            subject_name: int
     ) -> SubjectMarksForSubject:
         """
         Получить оценки по предмету
@@ -490,11 +489,11 @@ class AsyncMobileAPI(AsyncBaseApi):
         )
 
     async def get_lesson_schedule_items(
-        self,
-        profile_id: int,
-        lesson_id: int,
-        student_id: int,
-        type: str = "PLAN"
+            self,
+            profile_id: int,
+            lesson_id: int,
+            student_id: int,
+            type: str = "PLAN"
     ) -> LessonScheduleItems:
         """
         Получить информацию об уроке
@@ -514,11 +513,11 @@ class AsyncMobileAPI(AsyncBaseApi):
         )
 
     async def get_rating_rank_class(
-        self,
-        profile_id: int,
-        person_id: str,
-        classUnitId: int,
-        date: date = None
+            self,
+            profile_id: int,
+            person_id: str,
+            classUnitId: int,
+            date: date = None
     ) -> list[RatingRankClass]:
         """
         Получить общий рейтинг класса
@@ -537,13 +536,13 @@ class AsyncMobileAPI(AsyncBaseApi):
                 "date": self.date_to_string(date)
             }
         )
-    
+
     async def get_raging_rank_short(
-        self,
-        profile_id: int,
-        person_id: str,
-        begin_date: date,
-        end_date: date
+            self,
+            profile_id: int,
+            person_id: str,
+            begin_date: date,
+            end_date: date
     ) -> list[RatingRankShort]:
         """
         Получить общий рейтинг класса
@@ -562,12 +561,12 @@ class AsyncMobileAPI(AsyncBaseApi):
                 "endDate": self.date_to_string(end_date),
             }
         )
-    
+
     async def get_rating_rank_subjects(
-        self,
-        profile_id: int,
-        person_id: str,
-        date: date
+            self,
+            profile_id: int,
+            person_id: str,
+            date: date
     ) -> list[RatingRankSubject]:
         """
         Получить рейтинг по предметам
@@ -585,4 +584,3 @@ class AsyncMobileAPI(AsyncBaseApi):
                 "date": self.date_to_string(date),
             }
         )
-    

@@ -34,6 +34,7 @@ class RatingRankShort(Type):
     date: datetime.date
     rankPlace: int
 
+
 class RatingRankSubject(Type):
     subject_id: int = Field(..., alias='subjectId')
     subject_name: str = Field(..., alias='subjectName')

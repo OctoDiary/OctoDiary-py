@@ -10,7 +10,7 @@ from .role import Role
 from .sessionuserinfo import SessionUserInfo
 from .studentprofile import StudentProfile
 from .user import User
-from .userchildrens import UserChildrens
+from .userchildren import UserChildren
 from .usercontact import UserContact
 from .userinfo import UserInfo
 from .webfamilyprofile import WebFamilyProfile
@@ -26,7 +26,7 @@ __all__ = [
     "PersonData",
     "Role",
     "EventsResponse",
-    "UserChildrens",
+    "UserChildren",
     "UserContact",
     "WebOrganizations",
 ]

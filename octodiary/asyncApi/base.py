@@ -29,13 +29,13 @@ class AsyncBaseApi(SyncBaseApi):
                         error_type="HTMLError",
                         description=error_html
                     )
-                
+
                 error_text = " ".join(
                     word
                     for word in error_html.split('<div class="error__description">')[-1]
-                    .split("<p>")[1]
-                    .strip()[:-4]
-                    .split()
+                                .split("<p>")[1]
+                                .strip()[:-4]
+                                .split()
                 )
                 raise APIError(
                     url=str(response.url),
@@ -43,7 +43,7 @@ class AsyncBaseApi(SyncBaseApi):
                     error_type="HTMLError",
                     description=error_text
                 )
-            
+
             try:
                 json_response = await response.json()
 
@@ -63,29 +63,29 @@ class AsyncBaseApi(SyncBaseApi):
                     description=(await response.text()),
                     details=None
                 )
-    
+
     async def get(
-        self,
-        url: str,
-        custom_headers: Optional[dict] = None,
-        model: Optional[Type] = None,
-        is_list: bool = False,
-        return_json: bool = False,
-        return_raw_text: bool = False,
-        required_token: bool = True,
-        return_raw_response: bool = False,
-        **kwargs
+            self,
+            url: str,
+            custom_headers: Optional[dict] = None,
+            model: Optional[Type] = None,
+            is_list: bool = False,
+            return_json: bool = False,
+            return_raw_text: bool = False,
+            required_token: bool = True,
+            return_raw_response: bool = False,
+            **kwargs
     ):
         params = kwargs.pop("params", {})
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                url=self.init_params(url, params),
-                headers=self.headers(required_token, custom_headers),
-                **kwargs
+                    url=self.init_params(url, params),
+                    headers=self.headers(required_token, custom_headers),
+                    **kwargs
             ) as response:
                 await self._check_response(response)
                 RAW_TEXT = await response.text()
-                
+
                 return (
                     response
                     if return_raw_response
@@ -99,31 +99,31 @@ class AsyncBaseApi(SyncBaseApi):
                     if model
                     else RAW_TEXT
                 )
-    
+
     async def post(
-        self,
-        url: str,
-        custom_headers: Optional[dict] = None,
-        json = None,
-        data = None,
-        model: Optional[Type] = None,
-        is_list: bool = False,
-        return_json: bool = False,
-        return_raw_text: bool = False,
-        required_token: bool = True,
-        return_raw_response: bool = False,
-        **kwargs
+            self,
+            url: str,
+            custom_headers: Optional[dict] = None,
+            json=None,
+            data=None,
+            model: Optional[Type] = None,
+            is_list: bool = False,
+            return_json: bool = False,
+            return_raw_text: bool = False,
+            required_token: bool = True,
+            return_raw_response: bool = False,
+            **kwargs
     ):
         params = kwargs.pop("params", {})
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                url=self.init_params(url, params),
-                headers=self.headers(required_token, custom_headers),
-                json=json, data=data, **kwargs
+                    url=self.init_params(url, params),
+                    headers=self.headers(required_token, custom_headers),
+                    json=json, data=data, **kwargs
             ) as response:
                 await self._check_response(response)
                 RAW_TEXT = await response.text()
-                
+
                 return (
                     response
                     if return_raw_response
@@ -139,29 +139,29 @@ class AsyncBaseApi(SyncBaseApi):
                 )
 
     async def put(
-        self,
-        url: str,
-        custom_headers: Optional[dict] = None,
-        json = None,
-        data = None, 
-        model: Optional[Type] = None,
-        is_list: bool = False,
-        return_json: bool = False,
-        return_raw_text: bool = False,
-        required_token: bool = True,
-        return_raw_response: bool = False,
-        **kwargs
+            self,
+            url: str,
+            custom_headers: Optional[dict] = None,
+            json=None,
+            data=None,
+            model: Optional[Type] = None,
+            is_list: bool = False,
+            return_json: bool = False,
+            return_raw_text: bool = False,
+            required_token: bool = True,
+            return_raw_response: bool = False,
+            **kwargs
     ):
         params = kwargs.pop("params", {})
         async with aiohttp.ClientSession() as session:
             async with session.put(
-                url=self.init_params(url, params),
-                headers=self.headers(required_token, custom_headers),
-                json=json, data=data, **kwargs
+                    url=self.init_params(url, params),
+                    headers=self.headers(required_token, custom_headers),
+                    json=json, data=data, **kwargs
             ) as response:
                 await self._check_response(response)
                 RAW_TEXT = await response.text()
-                
+
                 return (
                     response
                     if return_raw_response
@@ -175,31 +175,31 @@ class AsyncBaseApi(SyncBaseApi):
                     if model
                     else RAW_TEXT
                 )
-    
+
     async def delete(
-        self,
-        url: str,
-        custom_headers: Optional[dict] = None,
-        json = None,
-        data = None,
-        model: Optional[Type] = None,
-        is_list: bool = False,
-        return_json: bool = False,
-        return_raw_text: bool = False, 
-        required_token: bool = True,
-        return_raw_response: bool = False,
-        **kwargs
+            self,
+            url: str,
+            custom_headers: Optional[dict] = None,
+            json=None,
+            data=None,
+            model: Optional[Type] = None,
+            is_list: bool = False,
+            return_json: bool = False,
+            return_raw_text: bool = False,
+            required_token: bool = True,
+            return_raw_response: bool = False,
+            **kwargs
     ):
         params = kwargs.pop("params", {})
         async with aiohttp.ClientSession() as session:
             async with session.delete(
-                url=self.init_params(url, params),
-                headers=self.headers(required_token, custom_headers),
-                json=json, data=data, **kwargs
+                    url=self.init_params(url, params),
+                    headers=self.headers(required_token, custom_headers),
+                    json=json, data=data, **kwargs
             ) as response:
                 await self._check_response(response)
                 RAW_TEXT = await response.text()
-                
+
                 return (
                     response
                     if return_raw_response
@@ -213,4 +213,3 @@ class AsyncBaseApi(SyncBaseApi):
                     if model
                     else RAW_TEXT
                 )
-    
