@@ -11,7 +11,7 @@
 # OctoDiary-py
 Неофициальная Python-библиотека для использования API МЭШ / Моя Школа.
   
-# Установка
+## Установка
 
 ### Новейшая версия:
 ``` bash
@@ -23,10 +23,10 @@ $ pip install https://github.com/OctoDiary/OctoDiary-py/archive/main.zip --upgra
 $ pip install octodiary --upgrade
 ```
   
-# Использование
+## Использование
 Смотрите [Exaples.md](Examples.md)
   
-# Ссылки
+## Ссылки
 - [**PyPI**](https://pypi.org/project/octodiary/)
 - [**Другие проекты**](https://github.com/OctoDiary)
 - [**Telegram-канал**](https://t.me/OctoDiary)
