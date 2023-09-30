@@ -86,6 +86,7 @@ class SyncMobileAPI(SyncBaseApi):
                     )["aupd_token"]
                 )
             case "DONE":
+                self._mfa_details = None
                 return dict_from_cookiejar(
                     self.__login_request(self.session.get(response.json().get("redirect_url", ""))).cookies
                 )["aupd_token"]
@@ -102,8 +103,10 @@ class SyncMobileAPI(SyncBaseApi):
                     failed=resp_json.get("failed", None)
                 )
             case "ENTER_MFA":
+                self._mfa_details = response.json()["mfa_details"]
                 return False
             case other_action_or_failed:
+                self._mfa_details = None
                 raise APIError(
                     url="ESIA_AUTHORIZATION",
                     status_code=response.status,
@@ -150,9 +153,10 @@ class SyncMobileAPI(SyncBaseApi):
 
     def esia_enter_MFA(self, code: int) -> str:
         """2 этап получения API-TOKEN прохождение MFA: ввод кода"""
+        mfa_method = "otp" if self._mfa_details["type"] == "SMS" else "totp"
         enter_mfa = self.__login_request(
             self.session.post(
-                f"https://esia.gosuslugi.ru/aas/oauth2/api/login/totp/verify?code={code}",
+                f"https://esia.gosuslugi.ru/aas/oauth2/api/login/{mfa_method}/verify?code={code}",
                 cookies=self.__cookies
             )
         )

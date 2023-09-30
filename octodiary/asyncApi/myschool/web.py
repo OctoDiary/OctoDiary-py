@@ -104,9 +104,11 @@ class AsyncWebAPI(AsyncBaseApi):
                     failed=resp_json.get("failed", None)
                 )
             case "ENTER_MFA":
+                self._mfa_details = (await response.json())["mfa_details"]
                 return False
-            case other_action_or_failed:  # SOLVE_ANOMALY_REACTION  INVALID_TTP  INVALID_OTP
+            case other_action_or_failed:
                 await self.__session_login.close()
+
                 raise APIError(
                     url="ESIA_AUTHORIZATION",
                     status_code=response.status,
@@ -164,8 +166,9 @@ class AsyncWebAPI(AsyncBaseApi):
             Токен доступа
 
         """
+        mfa_method = "otp" if self._mfa_details["type"] == "SMS" else "totp"
         enter_mfa = await self.__session_login.post(
-            f"https://esia.gosuslugi.ru/aas/oauth2/api/login/totp/verify?code={code}"
+            f"https://esia.gosuslugi.ru/aas/oauth2/api/login/{mfa_method}/verify?code={code}"
         )
         enter_mfa_json = await enter_mfa.json()
         return await self.handle_action(

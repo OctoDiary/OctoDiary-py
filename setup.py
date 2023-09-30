@@ -23,7 +23,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/OctoDiary/OctoDiary-py",
     packages=find_packages(),
-    license="Apache License 2.0",
+    license="MIT License",
     install_requires=[
         "pydantic",
         "aiohttp",
