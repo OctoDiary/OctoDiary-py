@@ -5,12 +5,14 @@
 
 import re
 from datetime import date
-from typing import List, Union
+from typing import Optional, Union
 
-from aiohttp import ClientSession, ClientResponse
+from aiohttp import ClientResponse, ClientSession
 from aiohttp.cookiejar import CookieJar
 
+from octodiary.asyncApi.base import AsyncBaseApi
 from octodiary.exceptions import APIError
+from octodiary.types.captcha import async_generate_captcha_class
 from octodiary.types.myschool.mobile import (
     EventsResponse,
     FamilyProfile,
@@ -21,18 +23,18 @@ from octodiary.types.myschool.mobile import (
     PeriodSchedule,
     PersonData,
     ProfileInfo,
+    RatingRankClass,
+    RatingRankShort,
+    RatingRankSubject,
     ShortHomeworks,
     ShortSubjectMarks,
     SubjectList,
     SubjectMarksForSubject,
     UserChildrens,
     UserSettings,
-    RatingRankClass,
-    RatingRankSubject,
-    RatingRankShort,
 )
 from octodiary.types.myschool.web import SessionUserInfo
-from ..base import AsyncBaseApi
+from octodiary.urls import URLs
 
 
 class AsyncMobileAPI(AsyncBaseApi):
@@ -44,12 +46,12 @@ class AsyncMobileAPI(AsyncBaseApi):
         """Авторизоваться и получить токен напрямую через обычный логин и пароль."""
         return (
             await self.get(
-                url="https://authedu.mosreg.ru/v3/auth/kauth/callback",
+                url=URLs.LOGIN.AUTH_CALLBACK,
                 required_token=False, return_raw_response=True,
                 params={
                     "code": (
                         await self.post(
-                            url="https://authedu.mosreg.ru/lms/api/sessions",
+                            url=URLs.API_SESSIONS,
                             required_token=False,
                             json={
                                 "login": username,
@@ -65,8 +67,8 @@ class AsyncMobileAPI(AsyncBaseApi):
             )
         ).cookies.get("aupd_token").value
 
-    async def handle_action(self, response: ClientResponse, action: str = None, failed: str = None) -> str | bool:
-        match action or failed:
+    async def handle_action(self, response: ClientResponse, action: Optional[str] = None, failed: Optional[str] = None) -> str | bool:
+        match failed or action:
             case None:
                 return None
             case "FILL_MFA":
@@ -75,7 +77,7 @@ class AsyncMobileAPI(AsyncBaseApi):
                         (
                             await (
                                 await self.__session_login.post(
-                                    "https://esia.gosuslugi.ru/aas/oauth2/api/login/promo-mfa/fill-mfa?decision=false"
+                                    url=URLs.LOGIN.FILL_MFA
                                 )
                             ).json()
                         ).get("redirect_url", "")
@@ -94,7 +96,7 @@ class AsyncMobileAPI(AsyncBaseApi):
                 return token_request.cookies.get("aupd_token", None).value
             case "GRANT_SCOPE_ACCESS":
                 response = await self.__session_login.post(
-                    url="https://esia.gosuslugi.ru/aas/oauth2/api/scope/allow"
+                    url=URLs.LOGIN.ALLOW_SCOPE
                 )
                 resp_json = await response.json()
                 return await self.handle_action(
@@ -105,6 +107,11 @@ class AsyncMobileAPI(AsyncBaseApi):
             case "ENTER_MFA":
                 self._mfa_details = (await response.json())["mfa_details"]
                 return False
+            case "SOLVE_ANOMALY_REACTION":
+                return await async_generate_captcha_class(
+                    response_json=await response.json(),
+                    api=self, api_session=self.__session_login
+                )
             case other_action_or_failed:
                 await self.__session_login.close()
                 self._mfa_details = None
@@ -126,7 +133,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         self.__session_login = ClientSession(cookie_jar=self.__cookie, headers=self.headers(False))
         one: str = await (
             await self.__session_login.get(
-                "https://authedu.mosreg.ru/v3/auth/esia/login",
+                url=URLs.LOGIN.AUTHEDU_ESIA_LOGIN,
                 allow_redirects=False,
             )
         ).text()
@@ -134,10 +141,10 @@ class AsyncMobileAPI(AsyncBaseApi):
             re.findall(r"0\;url\=(.*?)\">", one)[0]
         )
         await self.__session_login.get(
-            "https://esia.gosuslugi.ru/aas/oauth2/config"
+            url=URLs.LOGIN.GOSUSLUGI_OAUTH2_CONFIG
         )
         login_response = await self.__session_login.post(
-            "https://esia.gosuslugi.ru/aas/oauth2/api/login",
+            url=URLs.LOGIN.GOSUSLUGI_API_LOGIN,
             json={
                 "login": username,
                 "password": password
@@ -154,7 +161,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         """2 этап получения API-TOKEN прохождение MFA: ввод кода"""
         mfa_method = "otp" if self._mfa_details["type"] == "SMS" else "totp"
         enter_mfa = await self.__session_login.post(
-            f"https://esia.gosuslugi.ru/aas/oauth2/api/login/{mfa_method}/verify?code={code}"
+            url=URLs.LOGIN.ENTER_MFA.format(METHOD=mfa_method, CODE=str(code)),
         )
         enter_mfa_json = await enter_mfa.json()
         return await self.handle_action(
@@ -163,12 +170,12 @@ class AsyncMobileAPI(AsyncBaseApi):
             failed=enter_mfa_json.get("failed", None)
         )
 
-    async def get_users_profile_info(self) -> List[ProfileInfo]:
+    async def get_users_profile_info(self) -> list[ProfileInfo]:
         """
         Получить информацию о профиле
         """
         return await self.get(
-            url="https://myschool.mosreg.ru/acl/api/users/profile_info",
+            url=URLs.PROFILE_INFO,
             custom_headers={
                 "partner-source-id": "MOBILE"
             },
@@ -181,7 +188,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить профиль пользователя
         """
         return await self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/profile",
+            url=URLs.MOBILE.FAMILY_PROFILE,
             custom_headers={
                 "x-mes-subsystem": "familymp",
                 "client-type": "diary-mobile",
@@ -200,7 +207,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить настройки приложения пользователя
         """
         return await self.get(
-            url="https://authedu.mosreg.ru/api/usersettings/v1",
+            url=URLs.USER_SETTINGS,
             params={
                 "name": name,
                 "subsystem_id": subsystem_id,
@@ -224,7 +231,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Изменить настройки приложения пользователя
         """
         await self.put(
-            url="https://authedu.mosreg.ru/api/usersettings/v1",
+            url=URLs.USER_SETTINGS,
             params={
                 "name": name,
                 "subsystem_id": subsystem_id,
@@ -242,13 +249,13 @@ class AsyncMobileAPI(AsyncBaseApi):
             self,
             person_id: str,
             mes_role: str,
-            begin_date: date = None,
-            end_date: date = None,
+            begin_date: Optional[date] = None,
+            end_date: Optional[date] = None,
             expand: str = "marks,homework,absence_reason_id,health_status,nonattendance_reason_id"
     ) -> EventsResponse:
         """Получите расписание."""
         return await self.get(
-            url="https://authedu.mosreg.ru/api/eventcalendar/v1/api/events",
+            url=URLs.EVENTS,
             custom_headers={
                 "x-mes-subsystem": "familymp",
                 "client-type": "diary-mobile",
@@ -276,7 +283,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить список домашних заданий
         """
         return await self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/homeworks/short",
+            url=URLs.MOBILE.HOMEWORKS_SHORT,
             params={
                 "student_id": student_id,
                 "from": from_date.strftime("%Y-%m-%d"),
@@ -303,7 +310,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить оценки
         """
         return await self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/marks",
+            url=URLs.MOBILE.MARKS,
             params={
                 "student_id": student_id,
                 "from": from_date.strftime("%Y-%m-%d"),
@@ -323,14 +330,14 @@ class AsyncMobileAPI(AsyncBaseApi):
             profile_id: int,
             from_date: date,
             to_date: date
-    ) -> List[PeriodSchedule]:
+    ) -> list[PeriodSchedule]:
         """
         Получить информацию о всех днях с from_date по to_date:
         - какой учебный модуль идет в этот день
         - что это: каникулы, выходной, рабочий день
         """
         return await self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/periods_schedules",
+            url=URLs.MOBILE.PERIODS_SCHEDULES,
             params={
                 "student_id": student_id,
                 "from": from_date.strftime("%Y-%m-%d"),
@@ -354,7 +361,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить оценки и ср.баллы по предметам за период времени
         """
         return await self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/subject_marks/short",
+            url=URLs.MOBILE.SUBJECT_MARKS_SHORT,
             params={
                 "student_id": student_id,
             },
@@ -370,12 +377,12 @@ class AsyncMobileAPI(AsyncBaseApi):
             self,
             student_id: int,
             profile_id: int,
-    ) -> List[SubjectList]:
+    ) -> list[SubjectList]:
         """
         Получить список предметов
         """
         return await self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/subjects/list",
+            url=URLs.MOBILE.SUBJECTS_LIST,
             model=SubjectList,
             is_list=True,
             params={
@@ -397,7 +404,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить программу обучения по текущему классу
         """
         return await self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/programs/parallel_curriculum/162269",
+            url=URLs.MOBILE.PROGRAMS_PARALLEL_CURRICULUM,
             model=ParallelCurriculum,
             is_list=True,
             params={
@@ -419,7 +426,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить подробную информацию о пользователе
         """
         return await self.get(
-            url=f"https://myschool.mosreg.ru/api/persondata/mobile/persons/{person_id}",
+            url=URLs.MOBILE.PERSON_DATA.format(person_id=person_id),
             model=PersonData,
             custom_headers={
                 "x-mes-subsystem": "familymp",
@@ -436,7 +443,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить детей пользователя
         """
         return await self.get(
-            url="https://authedu.mosreg.ru/v1/user/childrens",
+            url=URLs.CHILDRENS,
             params={
                 "person_id": person_id,
             },
@@ -451,12 +458,12 @@ class AsyncMobileAPI(AsyncBaseApi):
             self,
             student_id: int,
             profile_id: int
-    ) -> List[Notification]:
+    ) -> list[Notification]:
         """
         Получить уведомления пользователя
         """
         return await self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/notifications/search",
+            url=URLs.MOBILE.NOTIFICATIONS,
             model=Notification,
             is_list=True,
             params={
@@ -479,7 +486,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить оценки по предмету
         """
         return await self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/subject_marks/for_subject",
+            url=URLs.MOBILE.SUBJECT_MARKS,
             model=SubjectMarksForSubject,
             params={
                 "student_id": student_id,
@@ -503,7 +510,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить информацию об уроке
         """
         return await self.get(
-            url=f"https://api.myschool.mosreg.ru/family/mobile/v1/lesson_schedule_items/{lesson_id}",
+            url=URLs.MOBILE.LESSON_SCHEDULE_ITEMS.format(lesson_id=lesson_id),
             params={
                 "student_id": student_id,
                 "type": type
@@ -520,14 +527,14 @@ class AsyncMobileAPI(AsyncBaseApi):
             self,
             profile_id: int,
             person_id: str,
-            classUnitId: int,
-            date: date = None
+            class_unit_id: int,
+            date: Optional[date] = None
     ) -> list[RatingRankClass]:
         """
         Получить общий рейтинг класса
         """
         return await self.get(
-            url="https://authedu.mosreg.ru/api/ej/rating/v1/rank/class",
+            url=URLs.RATING_RANK_CLASS,
             model=RatingRankClass, is_list=True,
             custom_headers={
                 "x-mes-subsystem": "familymp",
@@ -536,7 +543,7 @@ class AsyncMobileAPI(AsyncBaseApi):
             },
             params={
                 "person_id": person_id,
-                "classUnitId": classUnitId,
+                "classUnitId": class_unit_id,
                 "date": self.date_to_string(date)
             }
         )
@@ -552,7 +559,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить общий рейтинг класса
         """
         return await self.get(
-            url="https://authedu.mosreg.ru/api/ej/rating/v1/rank/class",
+            url=URLs.RATING_RANK_SHORT,
             model=RatingRankShort, is_list=True,
             custom_headers={
                 "x-mes-subsystem": "familymp",
@@ -576,7 +583,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить рейтинг по предметам
         """
         return await self.get(
-            url="https://authedu.mosreg.ru/api/ej/rating/v1/rank/subject",
+            url=URLs.RATING_RANK_SUBJECTS,
             model=RatingRankSubject, is_list=True,
             custom_headers={
                 "x-mes-subsystem": "familymp",

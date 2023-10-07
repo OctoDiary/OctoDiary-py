@@ -3,11 +3,11 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import Field
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class Info(Type):
@@ -15,13 +15,13 @@ class Info(Type):
     mail: Optional[Any] = None
     gender: Optional[str] = None
     trusted: Optional[bool] = None
-    first_name: str = Field(..., alias='FirstName')
+    first_name: str = Field(..., alias="FirstName")
     mobile: Optional[Any] = None
     guid: Optional[str] = None
     failed: Optional[bool] = None
-    last_name: str = Field(..., alias='LastName')
+    last_name: str = Field(..., alias="LastName")
     error: Optional[Any] = None
-    middle_name: str = Field(..., alias='MiddleName')
+    middle_name: str = Field(..., alias="MiddleName")
     snils: Optional[str] = None
 
 
@@ -38,14 +38,14 @@ class Subsystem(Type):
 class Role(Type):
     id: int
     title: str
-    subsystems: List[Subsystem]
+    subsystems: list[Subsystem]
 
 
 class UserInfo(Type):
-    user_id: Optional[int] = Field(None, alias='userId')
-    is_ad_activated: Optional[bool] = Field(None, alias='isAdActivated')
+    user_id: Optional[int] = Field(None, alias="userId")
+    is_ad_activated: Optional[bool] = Field(None, alias="isAdActivated")
     info: Optional[Info] = None
-    roles: Optional[List[Role]] = None
-    saved_choice: Optional[Any] = Field(None, alias='savedChoice')
+    roles: Optional[list[Role]] = None
+    saved_choice: Optional[Any] = Field(None, alias="savedChoice")
     notification: Optional[bool] = None
     login: Optional[str] = None

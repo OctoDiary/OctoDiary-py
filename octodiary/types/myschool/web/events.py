@@ -4,11 +4,11 @@
 #           https://github.com/OctoDiary
 
 from datetime import date, datetime
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import Field
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class Material(Type):
@@ -23,8 +23,8 @@ class Entry(Type):
     description: str
     duration: Optional[int] = None
     materials: Optional[str]
-    attachment_ids: List
-    attachments: List
+    attachment_ids: list
+    attachments: list
     student_ids: Any
 
 
@@ -32,21 +32,21 @@ class HomeworkItem(Type):
     presence_status_id: Optional[int] = None
     total_count: Optional[int] = None
     execute_count: Optional[int]
-    descriptions: Optional[List[str]]
+    descriptions: Optional[list[str]]
     link_types: Any
     materials: Optional[Material]
-    entries: Optional[List[Entry]]
+    entries: Optional[list[Entry]]
 
 
 class LearningTargets(Type):
-    for_lesson: bool = Field(..., alias='forLesson')
-    for_home: bool = Field(..., alias='forHome')
+    for_lesson: bool = Field(..., alias="forLesson")
+    for_home: bool = Field(..., alias="forHome")
 
 
 class Material1(Type):
     uuid: str
-    learning_targets: LearningTargets = Field(..., alias='learningTargets')
-    is_hidden_from_students: bool = Field(..., alias='isHiddenFromStudents')
+    learning_targets: LearningTargets = Field(..., alias="learningTargets")
+    is_hidden_from_students: bool = Field(..., alias="isHiddenFromStudents")
 
 
 class ResponseItem(Type):
@@ -94,7 +94,7 @@ class ResponseItem(Type):
     activities: Any
     link_to_join: Any
     control: Any
-    class_unit_ids: Optional[List[int]]
+    class_unit_ids: Optional[list[int]]
     class_unit_name: Optional[str]
     group_id: Optional[int]
     group_name: Optional[str]
@@ -117,10 +117,10 @@ class ResponseItem(Type):
     comment_count: Any
     comments: Any
     homework: Optional[HomeworkItem]
-    materials: Optional[List[Material1]]
-    marks: Optional[List[Any]]
+    materials: Optional[list[Material1]]
+    marks: Optional[list[Any]]
 
 
 class EventsResponse(Type):
     total_count: Optional[int] = None
-    response: Optional[List[ResponseItem]] = None
+    response: Optional[list[ResponseItem]] = None

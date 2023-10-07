@@ -55,14 +55,14 @@ class AsyncBaseApi(SyncBaseApi):
                         description=json_response.get("description", None),
                         details=json_response.get("details", None),
                     )
-            except JSONDecodeError:
+            except JSONDecodeError as error:
                 raise APIError(
                     url=str(response.url),
                     status_code=response.status,
                     error_type="ServerError & JSONError",
                     description=(await response.text()),
                     details=None
-                )
+                ) from error
 
     async def get(
             self,

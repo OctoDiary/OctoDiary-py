@@ -19,8 +19,34 @@
     <summary><img width="40" height="40" src="https://img.icons8.com/fluency/64/python.png" alt="python"/> <h1>Async</h1></summary>
 
 ``` python
-from octodiary.asyncApi.myschool import AsyncWebAPI, AsyncMobileAPI
+import os
 from asyncio import run
+
+from octodiary.asyncApi.myschool import AsyncMobileAPI, AsyncWebAPI
+from octodiary.types.captcha import Captcha
+
+
+async def handle_captcha(captcha: Captcha, api: AsyncWebAPI | AsyncMobileAPI):
+    if captcha.question:
+        answer = input(captcha.question + ": ")
+        response = await captcha.async_asnwer_captcha(answer)
+        if isinstance(response, bool): # Требуется MFA код
+            code_mfa = int(input("MFA Code: ").strip()) # запрашиваем у пользователя код (SMS/TOTP)
+            return await api.esia_enter_MFA(code=code_mfa)
+        else:
+            return response
+    else:
+        with open("captcha.png", "wb") as image:
+            image.write(captcha.image_bytes)
+        
+        answer = input("Решите капчу из файла captcha.png: ")
+        response = await captcha.async_verify_captcha(answer)
+        os.remove("captcha.png")
+        if isinstance(response, bool): # Требуется MFA код
+            code_mfa = int(input("MFA Code: ").strip()) # запрашиваем у пользователя код (SMS/TOTP)
+            return await api.esia_enter_MFA(code=code_mfa)
+        else:
+            return response
 
 
 async def login_gosuslugi(
@@ -28,13 +54,13 @@ async def login_gosuslugi(
     login: str,
     password: str
 ):
-    # если у вас выключен вход с подтверждением (MFA):
-    TOKEN = await api.esia_login(login, password)
-
-    # если у вас включен вход с подтверждением (MFA):
-    await api.esia_login(login, password, True)
-    code_mfa = int(input("MFA Code: ").strip()) # запрашиваем у пользователя код (SMS/TOTP)
-    TOKEN = await api.esia_enter_MFA(code=code_mfa)
+    response: bool | Captcha = await api.esia_login(login, password)
+    if isinstance(response, bool): # Требуется MFA код
+        code_mfa = int(input("MFA Code: ").strip()) # запрашиваем у пользователя код (SMS/TOTP)
+        response2 = await api.esia_enter_MFA(code=code_mfa)
+        TOKEN = response2 if isinstance(response2, str) else await handle_captcha(response2)
+    elif isinstance(response, Captcha): # Капча
+        TOKEN = await handle_captcha(response)
     
     api.token = TOKEN # сохраняем токен
     return TOKEN
@@ -48,7 +74,10 @@ async def web_api():
     api = AsyncWebAPI()
 
     # получение и сохранение токена по логину и паролю от госуслуг
-    await login_gosuslugi(api)
+    await login_gosuslugi(api, "login", "password")
+
+    # получение и сохранение токена по логину и паролю от "Моей Школы"
+    api.token = await api.login("login", "password")
     
     # получить информацию о пользователе
     user_info = await api.get_user_info()
@@ -77,7 +106,7 @@ async def web_api():
     student_profiles = await api.get_student_profiles(academic_year_id=ID)
 
     # получить информацию о web-профиле
-    # содержит подробную  информацию, включая личные данные
+    # содержит подробную информацию, включая личные данные
     web_profile = await api.get_family_web_profile()
 
     # получить фулл о пользователе (дада, методов много, но каждый дает свое)
@@ -222,7 +251,33 @@ run(main())
     <summary><img width="40" height="40" src="https://img.icons8.com/fluency/64/python.png" alt="python"/> <h1>Sync</h1></summary>
 
 ``` python
-from octodiary.syncApi.myschool import SyncWebAPI, SyncMobileAPI
+import os
+
+from octodiary.syncApi.myschool import SyncMobileAPI, SyncWebAPI
+from octodiary.types.captcha import Captcha
+
+
+def handle_captcha(captcha: Captcha, api: SyncWebAPI | SyncMobileAPI):
+    if captcha.question:
+        answer = input(captcha.question + ": ")
+        response = captcha.asnwer_captcha(answer)
+        if isinstance(response, bool): # Требуется MFA код
+            code_mfa = int(input("MFA Code: ").strip()) # запрашиваем у пользователя код (SMS/TOTP)
+            return api.esia_enter_MFA(code=code_mfa)
+        else:
+            return response
+    else:
+        with open("captcha.png", "wb") as image:
+            image.write(captcha.image_bytes)
+        
+        answer = input("Решите капчу из файла captcha.png: ")
+        response = captcha.verify_captcha(answer)
+        os.remove("captcha.png")
+        if isinstance(response, bool): # Требуется MFA код
+            code_mfa = int(input("MFA Code: ").strip()) # запрашиваем у пользователя код (SMS/TOTP)
+            return api.esia_enter_MFA(code=code_mfa)
+        else:
+            return response
 
 
 def login_gosuslugi(
@@ -230,13 +285,16 @@ def login_gosuslugi(
     login: str,
     password: str
 ):
-    # если у вас выключен вход с подтверждением (MFA):
-    TOKEN = api.esia_login(login, password)
-
     # если у вас включен вход с подтверждением (MFA):
-    api.esia_login(login, password, True)
-    code_mfa = int(input("MFA Code: ").strip()) # запрашиваем у пользователя код (SMS/TOTP)
-    TOKEN = api.esia_enter_MFA(code=code_mfa)
+    response: bool | Captcha | str = api.esia_login(login, password)
+    if isinstance(response, bool): # Требуется MFA код
+        code_mfa = int(input("MFA Code: ").strip()) # запрашиваем у пользователя код (SMS/TOTP)
+        response2 = api.esia_enter_MFA(code=code_mfa)
+        TOKEN = response2 if isinstance(response2, str) else handle_captcha(response2)
+    elif isinstance(response, Captcha): # Капча
+        TOKEN = handle_captcha(response)
+    else:
+        TOKEN = response
     
     api.token = TOKEN # сохраняем токен
     return TOKEN
@@ -250,7 +308,10 @@ def web_api():
     api = SyncWebAPI()
 
     # получение и сохранение токена по логину и паролю от госуслуг
-    login_gosuslugi(api)
+    login_gosuslugi(api, "login", "password")
+
+    # получение и сохранение токена по логину и паролю от "Моей Школы"
+    api.token = api.login("login", "password")
     
     # получить информацию о пользователе
     user_info = api.get_user_info()
@@ -279,7 +340,7 @@ def web_api():
     student_profiles = api.get_student_profiles(academic_year_id=ID)
 
     # получить информацию о web-профиле
-    # содержит подробную  информацию, включая личные данные
+    # содержит подробную информацию, включая личные данные
     web_profile = api.get_family_web_profile()
 
     # получить фулл о пользователе (дада, методов много, но каждый дает свое)
@@ -415,7 +476,8 @@ def main():
     web_api()
     mobile_api()
 
-main()
+if __name__ == "__main__":
+    main()
 ```
 
 </details>

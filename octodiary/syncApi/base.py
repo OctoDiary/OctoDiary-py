@@ -37,12 +37,13 @@ class SyncBaseApi:
             "User-Agent": self.user_agent,
             "Content-Type": "application/json",
             "Accept": "application/json, text/plain, */*",
-            'Accept-Language': 'ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
+            "Accept-Language": "ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Connection": "keep-alive",
         }
         if not self.token and require_token:
-            raise ValueError("Token is required!")
+            msg = "Token is required!"
+            raise ValueError(msg)
         elif require_token:
             HEADERS.update({
                 "Authorization": f"Bearer {self.token}",
@@ -108,7 +109,7 @@ class SyncBaseApi:
         class ListModels(Type):
             listik: list[model]
 
-        return ListModels.model_validate_json('{"listik": ' + response.replace("'", '"') + '}').listik
+        return ListModels.model_validate_json('{"listik": ' + response.replace("'", '"') + "}").listik
 
     @staticmethod
     def _check_response(response: requests.Response):
@@ -148,14 +149,14 @@ class SyncBaseApi:
                         description=json_response.get("description", None),
                         details=json_response.get("details", None),
                     )
-            except requests.exceptions.JSONDecodeError:
+            except requests.exceptions.JSONDecodeError as e:
                 raise APIError(
                     url=str(response.url),
                     status_code=response.status_code,
                     error_type="JSONError",
                     description=response.text,
                     details=None
-                )
+                ) from e
 
     def get(
             self,

@@ -3,9 +3,9 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class Subject(Type):
@@ -19,7 +19,7 @@ class Subject(Type):
 
 class Section(Type):
     knowledge_field_name: str
-    subjects: List[Subject]
+    subjects: list[Subject]
 
 
 class ParallelCurriculum(Type):
@@ -27,7 +27,7 @@ class ParallelCurriculum(Type):
     hours: Optional[int] = None
     comments: Optional[Any] = None
     specialization: Optional[Any] = None
-    sections: Optional[List[Section]] = None
+    sections: Optional[list[Section]] = None
     short_name: Optional[str] = None
     education_level: Optional[str] = None
     days_in_week: Optional[int] = None

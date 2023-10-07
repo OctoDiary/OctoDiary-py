@@ -3,9 +3,9 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class ClassUnit(Type):
@@ -71,7 +71,7 @@ class StudentProfile(Type):
     previously_class_unit: Optional[Any] = None
     curricula: Optional[Curricula] = None
     non_attendance: Optional[int] = None
-    mentors: Optional[List[Mentor]] = []
+    mentors: Optional[list[Mentor]] = []
     ispp_account: Optional[Any] = None
     previously_profile_id: Optional[Any] = None
     student_viewed: Optional[Any] = None
@@ -80,15 +80,15 @@ class StudentProfile(Type):
     class_level: Optional[Any] = None
     snils: Optional[Any] = None
     last_sign_in_at: Optional[Any] = None
-    groups: Optional[List] = []
-    parents: Optional[List[Parent]] = []
-    marks: Optional[List] = []
-    final_marks: Optional[List] = []
-    attendances: Optional[List] = []
-    lesson_comments: Optional[List] = []
-    home_based_periods: Optional[List] = []
-    subjects: Optional[List] = []
-    ae_attendances: Optional[List] = []
-    ec_attendances: Optional[List] = []
-    assignments: Optional[List] = []
+    groups: Optional[list] = []
+    parents: Optional[list[Parent]] = []
+    marks: Optional[list] = []
+    final_marks: Optional[list] = []
+    attendances: Optional[list] = []
+    lesson_comments: Optional[list] = []
+    home_based_periods: Optional[list] = []
+    subjects: Optional[list] = []
+    ae_attendances: Optional[list] = []
+    ec_attendances: Optional[list] = []
+    assignments: Optional[list] = []
     left_on_registry: Optional[Any] = None

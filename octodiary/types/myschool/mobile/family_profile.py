@@ -3,9 +3,9 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class Profile(Type):
@@ -72,9 +72,9 @@ class Child(Type):
     class_name: Optional[str] = None
     class_level_id: Optional[int] = None
     class_unit_id: Optional[int] = None
-    groups: Optional[List[Group]] = []
-    representatives: Optional[List[Representative]] = []
-    sections: Optional[List] = []
+    groups: Optional[list[Group]] = []
+    representatives: Optional[list[Representative]] = []
+    sections: Optional[list] = []
     sudir_account_exists: Optional[bool] = None
     sudir_login: Optional[Any] = None
     is_legal_representative: Optional[bool] = None
@@ -85,5 +85,5 @@ class Child(Type):
 
 class FamilyProfile(Type):
     profile: Optional[Profile] = None
-    children: Optional[List[Child]] = None
+    children: Optional[list[Child]] = None
     hash: Optional[str] = None

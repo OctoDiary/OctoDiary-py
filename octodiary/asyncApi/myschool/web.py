@@ -5,12 +5,14 @@
 
 import re
 from datetime import date
-from typing import List, Union
+from typing import Optional, Union
 
-from aiohttp import ClientSession, ClientResponse
+from aiohttp import ClientResponse, ClientSession
 from aiohttp.cookiejar import CookieJar
 
+from octodiary.asyncApi.base import AsyncBaseApi
 from octodiary.exceptions import APIError
+from octodiary.types.captcha import async_generate_captcha_class
 from octodiary.types.myschool.web import (
     AcademicYear,
     EventsResponse,
@@ -25,7 +27,7 @@ from octodiary.types.myschool.web import (
     WebFamilyProfile,
     WebOrganizations,
 )
-from ..base import AsyncBaseApi
+from octodiary.urls import URLs
 
 
 class AsyncWebAPI(AsyncBaseApi):
@@ -46,12 +48,12 @@ class AsyncWebAPI(AsyncBaseApi):
         """
         return (
             await self.get(
-                url="https://authedu.mosreg.ru/v3/auth/kauth/callback",
+                url=URLs.LOGIN.AUTH_CALLBACK,
                 required_token=False, return_raw_response=True,
                 params={
                     "code": (
                         await self.post(
-                            url="https://authedu.mosreg.ru/lms/api/sessions",
+                            url=URLs.API_SESSIONS,
                             required_token=False,
                             json={
                                 "login": username,
@@ -67,8 +69,8 @@ class AsyncWebAPI(AsyncBaseApi):
             )
         ).cookies.get("aupd_token").value
 
-    async def handle_action(self, response: ClientResponse, action: str = None, failed: str = None) -> str | bool:
-        match action or failed:
+    async def handle_action(self, response: ClientResponse, action: Optional[str] = None, failed: Optional[str] = None) -> str | bool:
+        match failed or action:
             case None:
                 return None
             case "FILL_MFA":
@@ -77,7 +79,7 @@ class AsyncWebAPI(AsyncBaseApi):
                         (
                             await (
                                 await self.__session_login.post(
-                                    "https://esia.gosuslugi.ru/aas/oauth2/api/login/promo-mfa/fill-mfa?decision=false"
+                                    URLs.LOGIN.FILL_MFA
                                 )
                             ).json()
                         ).get("redirect_url", "")
@@ -95,7 +97,7 @@ class AsyncWebAPI(AsyncBaseApi):
                 return token_request.cookies.get("aupd_token", None).value
             case "GRANT_SCOPE_ACCESS":
                 response = await self.__session_login.post(
-                    url="https://esia.gosuslugi.ru/aas/oauth2/api/scope/allow"
+                    url=URLs.LOGIN.ALLOW_SCOPE
                 )
                 resp_json = await response.json()
                 return await self.handle_action(
@@ -106,6 +108,12 @@ class AsyncWebAPI(AsyncBaseApi):
             case "ENTER_MFA":
                 self._mfa_details = (await response.json())["mfa_details"]
                 return False
+            case "SOLVE_ANOMALY_REACTION":
+                return await async_generate_captcha_class(
+                    self,
+                    (await response.json()),
+                    self.__session_login
+                )
             case other_action_or_failed:
                 await self.__session_login.close()
 
@@ -132,7 +140,7 @@ class AsyncWebAPI(AsyncBaseApi):
         self.__session_login = ClientSession(cookie_jar=self.__cookie, headers=self.headers(False))
         one: str = await (
             await self.__session_login.get(
-                "https://authedu.mosreg.ru/v3/auth/esia/login",
+                URLs.LOGIN.AUTHEDU_ESIA_LOGIN,
                 allow_redirects=False,
             )
         ).text()
@@ -140,10 +148,10 @@ class AsyncWebAPI(AsyncBaseApi):
             re.findall(r"0;url=(.*?)\">", one)[0]
         )
         await self.__session_login.get(
-            "https://esia.gosuslugi.ru/aas/oauth2/config"
+            URLs.LOGIN.GOSUSLUGI_OAUTH2_CONFIG
         )
         login_response = await self.__session_login.post(
-            "https://esia.gosuslugi.ru/aas/oauth2/api/login",
+            URLs.LOGIN.GOSUSLUGI_API_LOGIN,
             json={
                 "login": username,
                 "password": password
@@ -168,7 +176,10 @@ class AsyncWebAPI(AsyncBaseApi):
         """
         mfa_method = "otp" if self._mfa_details["type"] == "SMS" else "totp"
         enter_mfa = await self.__session_login.post(
-            f"https://esia.gosuslugi.ru/aas/oauth2/api/login/{mfa_method}/verify?code={code}"
+            url=URLs.LOGIN.ENTER_MFA.format(
+                METHOD=mfa_method,
+                CODE=str(code)
+            )
         )
         enter_mfa_json = await enter_mfa.json()
         return await self.handle_action(
@@ -184,9 +195,9 @@ class AsyncWebAPI(AsyncBaseApi):
             UserInfo
 
         """
-        return await self.get("https://authedu.mosreg.ru/v3/userinfo", model=UserInfo)
+        return await self.get(url=URLs.USER_INFO, model=UserInfo)
 
-    async def refresh_token(self, role_id: int = None, subsystem: int = None) -> str:
+    async def refresh_token(self, role_id: Optional[int] = None, subsystem: Optional[int] = None) -> str:
         """
         Обновить токен доступа
         Args:
@@ -198,7 +209,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            "https://authedu.mosreg.ru/v2/token/refresh",
+            url=URLs.REFRESH_TOKEN,
             params={"roleId": role_id, "subsystem": subsystem},
             return_raw_text=True
         )
@@ -207,10 +218,10 @@ class AsyncWebAPI(AsyncBaseApi):
             self,
             published: bool = True,
             today: bool = True,
-            profile_id: int = None,
-            profile_type: str = None,
-            pid: int = None
-    ) -> List:
+            profile_id: Optional[int] = None,
+            profile_type: Optional[str] = None,
+            pid: Optional[int] = None
+    ) -> list:
         """
         Получить сообщения системы
         Args:
@@ -225,7 +236,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            "https://myschool.mosreg.ru/acl/api/system_messages",
+            url=URLs.SYSTEM_MESSAGES,
             custom_headers={
                 "Accept": "application/json",
                 "Profile-Id": profile_id,
@@ -243,8 +254,8 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.post(
-            "https://myschool.mosreg.ru/lms/api/sessions",
-            {
+            url=URLs.API_SESSIONS2,
+            custom_headers={
                 "auth_token": self.token,
                 "Content-Type": "application/json;charset=utf-8",
             },
@@ -254,10 +265,10 @@ class AsyncWebAPI(AsyncBaseApi):
 
     async def get_academic_years(
             self,
-            profile_id: int = None,
-            profile_type: str = None,
-            pid: int = None
-    ) -> List[AcademicYear]:
+            profile_id: Optional[int] = None,
+            profile_type: Optional[str] = None,
+            pid: Optional[int] = None
+    ) -> list[AcademicYear]:
         """
         Получить учебные года
         Args:
@@ -270,8 +281,8 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            "https://myschool.mosreg.ru/core/api/academic_years",
-            {
+            url=URLs.ACADEMIC_YEARS,
+            custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
             },
@@ -282,33 +293,33 @@ class AsyncWebAPI(AsyncBaseApi):
 
     async def get_user(
             self,
-            ids: Union[int, List[int]] = 1,
-            pid: int = None,
-            profile_id: int = None,
-            profile_type: str = None
-    ) -> Union[User, List[User]]:
+            ids: Union[int, list[int]] = 1,
+            pid: Optional[int] = None,
+            profile_id: Optional[int] = None,
+            profile_type: Optional[str] = None
+    ) -> Union[User, list[User]]:
         """
         Получить информацию о пользователе(-ях)
         Args:
-            ids: int или List[int]
+            ids: int или list[int]
             pid: int
             profile_id: int
             profile_type: str
 
         Returns:
-            User или List[User]
+            User или list[User]
 
         """
         return await self.get(
-            "https://myschool.mosreg.ru/acl/api/users",
-            {
+            url=URLs.USER,
+            custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
             },
             model=User,
             is_list=True,
             params={
-                "ids": ids if isinstance(ids, int) else ','.join(map(str, ids)),
+                "ids": ids if isinstance(ids, int) else ",".join(map(str, ids)),
                 "pid": pid,
             }
         )
@@ -318,10 +329,10 @@ class AsyncWebAPI(AsyncBaseApi):
             academic_year_id: int = 0,
             page: int = 1,
             per_page: int = 50,
-            pid: int = None,
-            profile_id: int = None,
-            profile_type: str = None
-    ) -> Union[StudentProfile, List[StudentProfile]]:
+            pid: Optional[int] = None,
+            profile_id: Optional[int] = None,
+            profile_type: Optional[str] = None
+    ) -> Union[StudentProfile, list[StudentProfile]]:
         """
         Получить информацию об ученике(-ах)
         Args:
@@ -333,12 +344,12 @@ class AsyncWebAPI(AsyncBaseApi):
             profile_type: str
 
         Returns:
-            StudentProfile или List[StudentProfile]
+            StudentProfile или list[StudentProfile]
 
         """
         return await self.get(
-            "https://myschool.mosreg.ru/core/api/student_profiles",
-            {
+            url=URLs.STUDENT_PROFILES,
+            custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
             },
@@ -354,8 +365,8 @@ class AsyncWebAPI(AsyncBaseApi):
 
     async def get_family_web_profile(
             self,
-            profile_id: int = None,
-            profile_type: str = None,
+            profile_id: Optional[int] = None,
+            profile_type: Optional[str] = None,
             nocache: bool = True
     ) -> WebFamilyProfile:
         """
@@ -370,8 +381,8 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            "https://authedu.mosreg.ru/api/family/web/v1/profile",
-            {
+            url=URLs.WEB.FAMILY_PROFILE,
+            custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
                 "X-mes-subsystem": "familyweb",
@@ -393,22 +404,22 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            f"https://authedu.mosreg.ru/api/persondata/v1/persons/{person_id}",
-            {
+            url=URLs.PERSON_DATA.format(person_id=person_id),
+            custom_headers={
                 "x-mes-subsystem": "headerweb",
             },
             model=PersonData,
         )
 
-    async def get_all_roles_global(self) -> List[Role]:
+    async def get_all_roles_global(self) -> list[Role]:
         """
         Получить список всех ролей
         Returns:
-            List[Role]
+            list[Role]
 
         """
         return await self.get(
-            "https://authedu.mosreg.ru/v1/roles/allGlobal/",
+            url=URLs.ROLES,
             model=Role, is_list=True, required_token=False
         )
 
@@ -416,8 +427,8 @@ class AsyncWebAPI(AsyncBaseApi):
             self,
             person_id: str,
             mes_role: str,
-            begin_date: date = None,
-            end_date: date = None,
+            begin_date: Optional[date] = None,
+            end_date: Optional[date] = None,
             expand: str = "marks,homework,absence_reason_id,health_status,nonattendance_reason_id"
     ) -> EventsResponse:
         """
@@ -434,8 +445,8 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            "https://authedu.mosreg.ru/api/eventcalendar/v1/api/events",
-            {
+            url=URLs.EVENTS,
+            custom_headers={
                 "X-Mes-Subsystem": "familyweb",
                 "X-Mes-Role": mes_role,
             },
@@ -460,7 +471,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            "https://authedu.mosreg.ru/v1/user/childrens",
+            url=URLs.CHILDRENS,
             model=UserChildren,
             params={
                 "sso_id": sso_id,
@@ -468,15 +479,15 @@ class AsyncWebAPI(AsyncBaseApi):
             }
         )
 
-    async def get_user_contacts(self) -> List[UserContact]:
+    async def get_user_contacts(self) -> list[UserContact]:
         """
         Получить контактные данные пользователя
         Returns:
-            List[UserContact]
+            list[UserContact]
 
         """
         return await self.get(
-            "https://authedu.mosreg.ru/v1/user/contacts",
+            url=URLs.USER_CONTACTS,
             model=UserContact,
             params={
                 "source": "CONTINGENT",
@@ -504,7 +515,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            "https://authedu.mosreg.ru/v1/nsi/organisations",
+            url=URLs.ORGANIZATIONS,
             model=WebOrganizations,
             params={
                 "page": page,

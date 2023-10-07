@@ -3,19 +3,19 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import Field
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class Profile(Type):
     id: Optional[int] = None
     type: Optional[str] = None
-    roles: Optional[List] = []
+    roles: Optional[list] = []
     user_id: Optional[int] = None
-    children_profile_ids: Optional[List[int]] = []
+    children_profile_ids: Optional[list[int]] = []
 
 
 class User(Type):
@@ -24,11 +24,11 @@ class User(Type):
     sex: Optional[str] = None
     password: Optional[Any] = None
     locked: Optional[bool] = None
-    temporary_locked: bool = Field(..., alias='temporaryLocked')
-    full_count: int = Field(..., alias='fullCount')
-    sessions_count: int = Field(..., alias='sessionsCount')
-    updated_at: Any = Field(..., alias='updatedAt')
-    profiles: Optional[List[Profile]] = []
+    temporary_locked: bool = Field(..., alias="temporaryLocked")
+    full_count: int = Field(..., alias="fullCount")
+    sessions_count: int = Field(..., alias="sessionsCount")
+    updated_at: Any = Field(..., alias="updatedAt")
+    profiles: Optional[list[Profile]] = []
     captcha: Optional[Any] = None
     hidden: Optional[bool] = None
     gusoev_login: Optional[str] = None

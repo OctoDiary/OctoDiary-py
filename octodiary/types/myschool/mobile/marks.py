@@ -3,9 +3,9 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class PayloadItem(Type):
@@ -29,4 +29,4 @@ class PayloadItem(Type):
 
 
 class Marks(Type):
-    payload: Optional[List[PayloadItem]] = None
+    payload: Optional[list[PayloadItem]] = None

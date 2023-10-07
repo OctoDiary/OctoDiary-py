@@ -3,8 +3,8 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from . import myschool
-from .base import SyncBaseApi
+from octodiary.syncApi import myschool
+from octodiary.syncApi.base import SyncBaseApi
 
 __all__ = [
     "SyncBaseApi",

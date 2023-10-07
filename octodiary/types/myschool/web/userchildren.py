@@ -3,12 +3,12 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import Field
 
-from .persondata import EveryType
-from ...model import Type
+from octodiary.types.model import Type
+from octodiary.types.myschool.web.persondata import EveryType
 
 
 class EntityContact(Type):
@@ -41,7 +41,7 @@ class EducationItem(Type):
     training_begin_at: Optional[str] = None
     training_end_at: Optional[str] = None
     service_type: Optional[EveryType] = None
-    class_: Class = Field(..., alias='class')
+    class_: Class = Field(..., alias="class")
 
 
 class Category(Type):
@@ -139,11 +139,11 @@ class AgentPerson(Type):
     updated_at: Optional[Any] = None
     addresses: Optional[Any] = None
     documents: Optional[Any] = None
-    contacts: Optional[List[Contact]] = []
+    contacts: Optional[list[Contact]] = []
     preventions: Optional[Any] = None
     categories: Optional[Any] = None
     agents: Optional[Any] = None
-    children: Optional[List[Child]] = []
+    children: Optional[list[Child]] = []
     education: Optional[Any] = None
     citizenship: Optional[Any] = None
     validation_errors: Optional[Any] = None
@@ -170,28 +170,28 @@ class Agent(Type):
 
 class Entity(Type):
     id: Optional[int] = None
-    obr_id: int = Field(..., alias='obrId')
+    obr_id: int = Field(..., alias="obrId")
     login: Optional[Any] = None
-    sso_id: Any = Field(..., alias='ssoId')
-    staff_id: Any = Field(..., alias='staffId')
+    sso_id: Any = Field(..., alias="ssoId")
+    staff_id: Any = Field(..., alias="staffId")
     firstname: Optional[str] = None
     lastname: Optional[str] = None
     patronymic: Optional[str] = None
-    last_logged: Any = Field(..., alias='lastLogged')
+    last_logged: Any = Field(..., alias="lastLogged")
     organizations: Optional[Any] = None
     source: Optional[Any] = None
-    active_student: bool = Field(..., alias='activeStudent')
-    emails: Optional[List[str]] = None
-    phones: Optional[List[str]] = None
+    active_student: bool = Field(..., alias="activeStudent")
+    emails: Optional[list[str]] = None
+    phones: Optional[list[str]] = None
     active: Optional[Any] = None
-    regional_student: bool = Field(..., alias='regionalStudent')
-    regional_emploee: bool = Field(..., alias='regionalEmploee')
+    regional_student: bool = Field(..., alias="regionalStudent")
+    regional_emploee: bool = Field(..., alias="regionalEmploee")
     person_id: Optional[str] = None
-    contacts: Optional[List[EntityContact]] = None
-    education: Optional[List[EducationItem]] = None
-    agents: Optional[List[Agent]] = None
+    contacts: Optional[list[EntityContact]] = None
+    education: Optional[list[EducationItem]] = None
+    agents: Optional[list[Agent]] = None
     agent_person: Optional[Any] = None
-    categories: Optional[List[Category]] = None
+    categories: Optional[list[Category]] = None
     children: Optional[Any] = None
     snils: Optional[str] = None
     validation_state_id: Optional[int] = None
@@ -208,6 +208,6 @@ class Entity(Type):
 class UserChildren(Type):
     page: Optional[int] = None
     size: Optional[int] = None
-    total_size: Optional[int] = Field(None, alias='totalSize')
-    parent_categories: Optional[Any] = Field(None, alias='parentCategories')
-    entities: Optional[List[Entity]] = None
+    total_size: Optional[int] = Field(None, alias="totalSize")
+    parent_categories: Optional[Any] = Field(None, alias="parentCategories")
+    entities: Optional[list[Entity]] = None

@@ -5,10 +5,10 @@
 
 from pydantic import Field
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class Role(Type):
     id: int
     title: str
-    global_role_tag: str = Field(..., alias='globalRoleTag')
+    global_role_tag: str = Field(..., alias="globalRoleTag")

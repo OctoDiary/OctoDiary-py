@@ -24,7 +24,7 @@ $ pip install octodiary --upgrade
 ```
   
 ## Использование
-Смотрите [Exaples.md](Examples.md)
+Смотрите [Examples.md](Examples.md)
   
 ## Ссылки
 - [**PyPI**](https://pypi.org/project/octodiary/)

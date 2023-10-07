@@ -6,12 +6,14 @@
 import http.cookiejar as cookielib
 import re
 from datetime import date
-from typing import List, Union
+from typing import Optional, Union
 
 from requests import Response
 from requests.utils import dict_from_cookiejar
 
 from octodiary.exceptions import APIError
+from octodiary.syncApi.base import SyncBaseApi
+from octodiary.types.captcha import generate_captcha_class
 from octodiary.types.myschool.mobile import (
     EventsResponse,
     FamilyProfile,
@@ -22,18 +24,18 @@ from octodiary.types.myschool.mobile import (
     PeriodSchedule,
     PersonData,
     ProfileInfo,
+    RatingRankClass,
+    RatingRankShort,
+    RatingRankSubject,
     ShortHomeworks,
     ShortSubjectMarks,
     SubjectList,
     SubjectMarksForSubject,
     UserChildrens,
     UserSettings,
-    RatingRankClass,
-    RatingRankSubject,
-    RatingRankShort
 )
 from octodiary.types.myschool.web import SessionUserInfo
-from ..base import SyncBaseApi
+from octodiary.urls import URLs
 
 
 class SyncMobileAPI(SyncBaseApi):
@@ -45,12 +47,12 @@ class SyncMobileAPI(SyncBaseApi):
         """Авторизоваться и получить токен напрямую через обычный логин и пароль."""
         return (
             self.get(
-                url="https://authedu.mosreg.ru/v3/auth/kauth/callback",
+                url=URLs.LOGIN.AUTH_CALLBACK,
                 required_token=False, return_raw_response=True,
                 params={
                     "code": (
                         self.post(
-                            url="https://authedu.mosreg.ru/lms/api/sessions",
+                            url=URLs.API_SESSIONS,
                             required_token=False,
                             json={
                                 "login": username,
@@ -66,8 +68,8 @@ class SyncMobileAPI(SyncBaseApi):
             )
         ).cookies["aupd_token"]
 
-    def handle_action(self, response: Response, action: str = None, failed: str = None) -> str | bool:
-        match action or failed:
+    def handle_action(self, response: Response, action: Optional[str] = None, failed: Optional[str] = None) -> str | bool:
+        match failed or action:
             case None:
                 return None
             case "FILL_MFA":
@@ -77,7 +79,7 @@ class SyncMobileAPI(SyncBaseApi):
                             self.session.get(
                                 self.__login_request(
                                     self.session.post(
-                                        "https://esia.gosuslugi.ru/aas/oauth2/api/login/promo-mfa/fill-mfa?decision=false",
+                                        url=URLs.LOGIN.FILL_MFA,
                                         cookies=self.__cookies
                                     )
                                 ).json().get("redirect_url", "")
@@ -88,12 +90,12 @@ class SyncMobileAPI(SyncBaseApi):
             case "DONE":
                 self._mfa_details = None
                 return dict_from_cookiejar(
-                    self.__login_request(self.session.get(response.json().get("redirect_url", ""))).cookies
+                    self.__login_request(self.session.get(url=response.json().get("redirect_url", ""))).cookies
                 )["aupd_token"]
             case "GRANT_SCOPE_ACCESS":
                 response = self.__login_request(
                     self.session.post(
-                        url="https://esia.gosuslugi.ru/aas/oauth2/api/scope/allow"
+                        url=URLs.LOGIN.ALLOW_SCOPE
                     )
                 )
                 resp_json = response.json()
@@ -105,6 +107,12 @@ class SyncMobileAPI(SyncBaseApi):
             case "ENTER_MFA":
                 self._mfa_details = response.json()["mfa_details"]
                 return False
+            case "SOLVE_ANOMALY_REACTION":
+                return generate_captcha_class(
+                    self,
+                    response.json(),
+                    self.session,
+                )
             case other_action_or_failed:
                 self._mfa_details = None
                 raise APIError(
@@ -130,14 +138,14 @@ class SyncMobileAPI(SyncBaseApi):
 
         one: str = self.__login_request(
             self.session.get(
-                "https://authedu.mosreg.ru/v3/auth/esia/login",
+                url=URLs.LOGIN.AUTHEDU_ESIA_LOGIN,
                 allow_redirects=False
             )
         ).text
         self.__login_request(self.session.get(re.findall(r"0\;url\=(.*?)\">", one)[0], cookies=self.__cookies))
-        self.__login_request(self.session.get("https://esia.gosuslugi.ru/aas/oauth2/config", cookies=self.__cookies))
+        self.__login_request(self.session.get(URLs.LOGIN.GOSUSLUGI_OAUTH2_CONFIG, cookies=self.__cookies))
         login = self.__login_request(self.session.post(
-            "https://esia.gosuslugi.ru/aas/oauth2/api/login",
+            URLs.LOGIN.GOSUSLUGI_API_LOGIN,
             json={
                 "login": username,
                 "password": password
@@ -156,7 +164,7 @@ class SyncMobileAPI(SyncBaseApi):
         mfa_method = "otp" if self._mfa_details["type"] == "SMS" else "totp"
         enter_mfa = self.__login_request(
             self.session.post(
-                f"https://esia.gosuslugi.ru/aas/oauth2/api/login/{mfa_method}/verify?code={code}",
+                url=URLs.LOGIN.ENTER_MFA.format(METHOD=mfa_method, CODE=str(code)),
                 cookies=self.__cookies
             )
         )
@@ -167,12 +175,12 @@ class SyncMobileAPI(SyncBaseApi):
             failed=enter_mfa_json.get("failed", None)
         )
 
-    def get_users_profile_info(self) -> List[ProfileInfo]:
+    def get_users_profile_info(self) -> list[ProfileInfo]:
         """
         Получить информацию о профиле
         """
         return self.get(
-            url="https://myschool.mosreg.ru/acl/api/users/profile_info",
+            url=URLs.PROFILE_INFO,
             custom_headers={
                 "partner-source-id": "MOBILE"
             },
@@ -185,7 +193,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить профиль пользователя
         """
         return self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/profile",
+            url=URLs.MOBILE.FAMILY_PROFILE,
             custom_headers={
                 "x-mes-subsystem": "familymp",
                 "client-type": "diary-mobile",
@@ -204,7 +212,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить настройки приложения пользователя
         """
         return self.get(
-            url="https://authedu.mosreg.ru/api/usersettings/v1",
+            url=URLs.USER_SETTINGS,
             params={
                 "name": name,
                 "subsystem_id": subsystem_id,
@@ -228,7 +236,7 @@ class SyncMobileAPI(SyncBaseApi):
         Изменить настройки приложения пользователя
         """
         self.put(
-            url="https://authedu.mosreg.ru/api/usersettings/v1",
+            url=URLs.USER_SETTINGS,
             params={
                 "name": name,
                 "subsystem_id": subsystem_id,
@@ -246,13 +254,13 @@ class SyncMobileAPI(SyncBaseApi):
             self,
             person_id: str,
             mes_role: str,
-            begin_date: date = None,
-            end_date: date = None,
+            begin_date: Optional[date] = None,
+            end_date: Optional[date] = None,
             expand: str = "marks,homework,absence_reason_id,health_status,nonattendance_reason_id"
     ) -> EventsResponse:
         """Получите расписание."""
         return self.get(
-            url="https://authedu.mosreg.ru/api/eventcalendar/v1/api/events",
+            url=URLs.EVENTS,
             custom_headers={
                 "x-mes-subsystem": "familymp",
                 "client-type": "diary-mobile",
@@ -280,7 +288,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить список домашних заданий
         """
         return self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/homeworks/short",
+            url=URLs.MOBILE.HOMEWORKS_SHORT,
             params={
                 "student_id": student_id,
                 "from": from_date.strftime("%Y-%m-%d"),
@@ -307,7 +315,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить оценки
         """
         return self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/marks",
+            url=URLs.MOBILE.MARKS,
             params={
                 "student_id": student_id,
                 "from": from_date.strftime("%Y-%m-%d"),
@@ -327,14 +335,14 @@ class SyncMobileAPI(SyncBaseApi):
             profile_id: int,
             from_date: date,
             to_date: date
-    ) -> List[PeriodSchedule]:
+    ) -> list[PeriodSchedule]:
         """
         Получить информацию о всех днях с from_date по to_date:
         - какой учебный модуль идет в этот день
         - что это: каникулы, выходной, рабочий день
         """
         return self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/periods_schedules",
+            url=URLs.MOBILE.PERIODS_SCHEDULES,
             params={
                 "student_id": student_id,
                 "from": from_date.strftime("%Y-%m-%d"),
@@ -358,7 +366,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить оценки и ср.баллы по предметам за период времени
         """
         return self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/subject_marks/short",
+            url=URLs.MOBILE.SUBJECT_MARKS_SHORT,
             params={
                 "student_id": student_id,
             },
@@ -374,12 +382,12 @@ class SyncMobileAPI(SyncBaseApi):
             self,
             student_id: int,
             profile_id: int,
-    ) -> List[SubjectList]:
+    ) -> list[SubjectList]:
         """
         Получить список предметов
         """
         return self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/subjects/list",
+            url=URLs.MOBILE.SUBJECTS_LIST,
             model=SubjectList,
             is_list=True,
             params={
@@ -401,7 +409,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить программу обучения по текущему классу
         """
         return self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/programs/parallel_curriculum/162269",
+            url=URLs.MOBILE.PROGRAMS_PARALLEL_CURRICULUM,
             model=ParallelCurriculum,
             is_list=True,
             params={
@@ -423,7 +431,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить подробную информацию о пользователе
         """
         return self.get(
-            url=f"https://myschool.mosreg.ru/api/persondata/mobile/persons/{person_id}",
+            url=URLs.MOBILE.PERSON_DATA.format(person_id=person_id),
             model=PersonData,
             custom_headers={
                 "x-mes-subsystem": "familymp",
@@ -440,7 +448,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить детей пользователя
         """
         return self.get(
-            url="https://authedu.mosreg.ru/v1/user/childrens",
+            url=URLs.CHILDRENS,
             params={
                 "person_id": person_id,
             },
@@ -455,12 +463,12 @@ class SyncMobileAPI(SyncBaseApi):
             self,
             student_id: int,
             profile_id: int
-    ) -> List[Notification]:
+    ) -> list[Notification]:
         """
         Получить уведомления пользователя
         """
         return self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/notifications/search",
+            url=URLs.MOBILE.NOTIFICATIONS,
             model=Notification,
             is_list=True,
             params={
@@ -483,7 +491,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить оценки по предмету
         """
         return self.get(
-            url="https://api.myschool.mosreg.ru/family/mobile/v1/subject_marks/for_subject",
+            url=URLs.MOBILE.SUBJECT_MARKS,
             model=SubjectMarksForSubject,
             params={
                 "student_id": student_id,
@@ -507,7 +515,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить информацию об уроке
         """
         return self.get(
-            url=f"https://api.myschool.mosreg.ru/family/mobile/v1/lesson_schedule_items/{lesson_id}",
+            url=URLs.MOBILE.LESSON_SCHEDULE_ITEMS.format(lesson_id=lesson_id),
             params={
                 "student_id": student_id,
                 "type": type
@@ -524,14 +532,14 @@ class SyncMobileAPI(SyncBaseApi):
             self,
             profile_id: int,
             person_id: str,
-            classUnitId: int,
-            date: date = None
+            class_unit_id: int,
+            date: Optional[date] = None
     ) -> list[RatingRankClass]:
         """
         Получить общий рейтинг класса
         """
         return self.get(
-            url="https://authedu.mosreg.ru/api/ej/rating/v1/rank/class",
+            url=URLs.RATING_RANK_CLASS,
             model=RatingRankClass, is_list=True,
             custom_headers={
                 "x-mes-subsystem": "familymp",
@@ -540,7 +548,7 @@ class SyncMobileAPI(SyncBaseApi):
             },
             params={
                 "person_id": person_id,
-                "classUnitId": classUnitId,
+                "classUnitId": class_unit_id,
                 "date": self.date_to_string(date)
             }
         )
@@ -556,7 +564,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить общий рейтинг класса
         """
         return self.get(
-            url="https://authedu.mosreg.ru/api/ej/rating/v1/rank/class",
+            url=URLs.RATING_RANK_SHORT,
             model=RatingRankShort, is_list=True,
             custom_headers={
                 "x-mes-subsystem": "familymp",
@@ -580,7 +588,7 @@ class SyncMobileAPI(SyncBaseApi):
         Получить рейтинг по предметам
         """
         return self.get(
-            url="https://authedu.mosreg.ru/api/ej/rating/v1/rank/subject",
+            url=URLs.RATING_RANK_SUBJECTS,
             model=RatingRankSubject, is_list=True,
             custom_headers={
                 "x-mes-subsystem": "familymp",

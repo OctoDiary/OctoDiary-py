@@ -3,18 +3,18 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from .academicyear import AcademicYear
-from .events import EventsResponse
-from .persondata import PersonData
-from .role import Role
-from .sessionuserinfo import SessionUserInfo
-from .studentprofile import StudentProfile
-from .user import User
-from .userchildren import UserChildren
-from .usercontact import UserContact
-from .userinfo import UserInfo
-from .webfamilyprofile import WebFamilyProfile
-from .weborganizations import WebOrganizations
+from octodiary.types.myschool.web.academicyear import AcademicYear
+from octodiary.types.myschool.web.events import EventsResponse
+from octodiary.types.myschool.web.persondata import PersonData
+from octodiary.types.myschool.web.role import Role
+from octodiary.types.myschool.web.sessionuserinfo import SessionUserInfo
+from octodiary.types.myschool.web.studentprofile import StudentProfile
+from octodiary.types.myschool.web.user import User
+from octodiary.types.myschool.web.userchildren import UserChildren
+from octodiary.types.myschool.web.usercontact import UserContact
+from octodiary.types.myschool.web.userinfo import UserInfo
+from octodiary.types.myschool.web.webfamilyprofile import WebFamilyProfile
+from octodiary.types.myschool.web.weborganizations import WebOrganizations
 
 __all__ = [
     "UserInfo",

@@ -3,10 +3,11 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from . import myschool
-from .model import Type
+from octodiary.types import captcha, myschool
+from octodiary.types.model import Type
 
 __all__ = [
     "Type",
     "myschool",
+    "captcha",
 ]

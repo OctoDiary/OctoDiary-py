@@ -4,11 +4,11 @@
 #           https://github.com/OctoDiary
 
 import datetime
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import Field
 
-from ...model import EveryType, Type
+from octodiary.types.model import EveryType, Type
 
 
 class Contact(Type):
@@ -41,7 +41,7 @@ class EducationItem(Type):
     training_begin_at: Optional[datetime.datetime | datetime.date] = None
     training_end_at: Optional[datetime.datetime | datetime.date] = None
     service_type: EveryType
-    class_: Class = Field(..., alias='class')
+    class_: Class = Field(..., alias="class")
 
 
 class Contact1(Type):
@@ -135,11 +135,11 @@ class AgentPerson(Type):
     updated_at: Optional[datetime.datetime | datetime.date] = None
     addresses: Optional[Any] = None
     documents: Optional[Any] = None
-    contacts: List[Contact1]
+    contacts: list[Contact1]
     preventions: Optional[Any] = None
     categories: Optional[Any] = None
     agents: Optional[Any] = None
-    children: List[Child]
+    children: list[Child]
     education: Optional[Any] = None
     citizenship: Optional[Any] = None
     validation_errors: Optional[Any] = None
@@ -181,17 +181,17 @@ class Entity(Type):
     organizations: Optional[Any] = None
     source: Optional[Any] = None
     activeStudent: Optional[bool] = None
-    emails: List[str]
-    phones: List[str]
+    emails: list[str]
+    phones: list[str]
     active: Optional[Any] = None
     regionalStudent: Optional[bool] = None
     regionalEmploee: Optional[bool] = None
     person_id: Optional[str] = None
-    contacts: List[Contact]
-    education: List[EducationItem]
-    agents: List[Agent]
+    contacts: list[Contact]
+    education: list[EducationItem]
+    agents: list[Agent]
     agent_person: Optional[Any] = None
-    categories: List[Category]
+    categories: list[Category]
     children: Optional[Any] = None
     snils: Optional[str] = None
     validation_state_id: Optional[int] = None
@@ -210,4 +210,4 @@ class UserChildrens(Type):
     size: Optional[int] = None
     totalSize: Optional[int] = None
     parentCategories: Optional[Any] = None
-    entities: List[Entity]
+    entities: list[Entity]

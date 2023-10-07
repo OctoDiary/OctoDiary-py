@@ -3,7 +3,7 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class ProfileInfo(Type):

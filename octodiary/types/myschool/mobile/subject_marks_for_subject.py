@@ -4,9 +4,9 @@
 #           https://github.com/OctoDiary
 
 import datetime
-from typing import Any, List, Optional
+from typing import Any, Optional
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class Mark(Type):
@@ -37,7 +37,7 @@ class Target(Type):
     value: Optional[int] = None
     remain: Optional[int] = None
     round: Optional[str] = None
-    paths: Optional[List[Path]] = []
+    paths: Optional[list[Path]] = []
 
 
 class Period(Type):
@@ -46,7 +46,7 @@ class Period(Type):
     title: Optional[str] = None
     dynamic: Optional[str] = None
     value: Optional[str] = None
-    marks: Optional[List[Mark]] = []
+    marks: Optional[list[Mark]] = []
     count: Optional[int] = None
     target: Optional[Target] = None
     fixed_value: Optional[Any] = None
@@ -55,7 +55,7 @@ class Period(Type):
 class SubjectMarksForSubject(Type):
     average: Optional[str] = None
     dynamic: Optional[str] = None
-    periods: Optional[List[Period]] = None
+    periods: Optional[list[Period]] = None
     subject_name: Optional[str] = None
     subject_id: Optional[int] = None
     average_by_all: Optional[str] = None

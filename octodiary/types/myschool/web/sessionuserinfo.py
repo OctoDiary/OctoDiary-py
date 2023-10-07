@@ -4,25 +4,25 @@
 #           https://github.com/OctoDiary
 
 from datetime import date
-from typing import List, Optional
+from typing import Optional
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class Profile(Type):
     id: Optional[int] = None
     type: Optional[str] = None
-    roles: Optional[List] = []
+    roles: Optional[list] = []
     user_id: Optional[int] = None
     agree_pers_data: Optional[bool] = None
-    subject_ids: Optional[List] = []
+    subject_ids: Optional[list] = []
 
 
 class SessionUserInfo(Type):
     id: Optional[int] = None
     email: Optional[str] = None
     snils: Optional[str] = None
-    profiles: Optional[List[Profile]] = []
+    profiles: Optional[list[Profile]] = []
     guid: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None

@@ -4,9 +4,9 @@
 #           https://github.com/OctoDiary
 
 import datetime
-from typing import Any, List, Optional
+from typing import Any, Optional
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class Path(Type):
@@ -19,7 +19,7 @@ class TargetItem(Type):
     value: Optional[int] = None
     remain: Optional[int] = None
     round: Optional[str]
-    paths: Optional[List[Path]] = []
+    paths: Optional[list[Path]] = []
 
 
 class Grade(Type):
@@ -43,7 +43,7 @@ class Criterion(Type):
 class Mark(Type):
     id: Optional[int] = None
     value: Optional[str] = None
-    values: Optional[List[Value]] = []
+    values: Optional[list[Value]] = []
     comment: Optional[str] = None
     weight: Optional[int] = None
     point_date: Optional[datetime.datetime | datetime.date] = None
@@ -51,7 +51,7 @@ class Mark(Type):
     comment_exists: Optional[bool] = None
     created_at: Optional[datetime.datetime | datetime.date] = None
     updated_at: Optional[datetime.datetime | datetime.date] = None
-    criteria: Optional[List[Criterion]] = []
+    criteria: Optional[list[Criterion]] = []
     date: Optional[str] = None
     is_exam: Optional[bool] = None
     is_point: Optional[bool] = None
@@ -64,7 +64,7 @@ class PayloadItem(Type):
     period: Optional[str]
     count: Optional[int]
     target: Optional[TargetItem]
-    marks: Optional[List[Mark]]
+    marks: Optional[list[Mark]]
     start: Optional[str]
     end: Optional[str]
     subject_name: Optional[str] = None
@@ -73,4 +73,4 @@ class PayloadItem(Type):
 
 
 class ShortSubjectMarks(Type):
-    payload: Optional[List[PayloadItem]] = None
+    payload: Optional[list[PayloadItem]] = None

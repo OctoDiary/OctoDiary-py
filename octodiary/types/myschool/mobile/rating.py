@@ -8,26 +8,26 @@ from typing import Optional
 
 from pydantic import Field
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class Rank(Type):
-    average_mark_five: Optional[float] = Field(..., alias='averageMarkFive')
-    rank_place: Optional[int] = Field(..., alias='rankPlace')
-    rank_status: Optional[str] = Field(..., alias='rankStatus')
+    average_mark_five: Optional[float] = Field(..., alias="averageMarkFive")
+    rank_place: Optional[int] = Field(..., alias="rankPlace")
+    rank_status: Optional[str] = Field(..., alias="rankStatus")
     trend: Optional[str] = None
 
 
 class PreviousRankItem(Type):
-    average_mark_five: Optional[float] = Field(..., alias='averageMarkFive')
-    rank_place: Optional[int] = Field(..., alias='rankPlace')
+    average_mark_five: Optional[float] = Field(..., alias="averageMarkFive")
+    rank_place: Optional[int] = Field(..., alias="rankPlace")
 
 
 class RatingRankClass(Type):
-    person_id: Optional[str] = Field(..., alias='personId')
+    person_id: Optional[str] = Field(..., alias="personId")
     rank: Optional[Rank] = None
-    previous_rank: Optional[PreviousRankItem] = Field(..., alias='previousRank')
-    image_id: Optional[int] = Field(..., alias='imageId')
+    previous_rank: Optional[PreviousRankItem] = Field(..., alias="previousRank")
+    image_id: Optional[int] = Field(..., alias="imageId")
 
 
 class RatingRankShort(Type):
@@ -36,6 +36,6 @@ class RatingRankShort(Type):
 
 
 class RatingRankSubject(Type):
-    subject_id: int = Field(..., alias='subjectId')
-    subject_name: str = Field(..., alias='subjectName')
+    subject_id: int = Field(..., alias="subjectId")
+    subject_name: str = Field(..., alias="subjectName")
     rank: Rank

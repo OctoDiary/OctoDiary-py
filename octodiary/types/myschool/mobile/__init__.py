@@ -3,22 +3,22 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from .events import EventsResponse
-from .family_profile import FamilyProfile
-from .lesson_schedule_items import LessonScheduleItems
-from .list_subjects import SubjectList
-from .marks import Marks
-from .notifications import Notification
-from .parallel_curriculum import ParallelCurriculum
-from .periods_schedule import PeriodSchedule
-from .person_data import PersonData
-from .rating import RatingRankClass, RatingRankShort, RatingRankSubject
-from .short_homeworks import ShortHomeworks
-from .short_subject_marks import ShortSubjectMarks
-from .subject_marks_for_subject import SubjectMarksForSubject
-from .user_childrens import UserChildrens
-from .user_settings import UserSettings
-from .users_profile_info import ProfileInfo
+from octodiary.types.myschool.mobile.events import EventsResponse
+from octodiary.types.myschool.mobile.family_profile import FamilyProfile
+from octodiary.types.myschool.mobile.lesson_schedule_items import LessonScheduleItems
+from octodiary.types.myschool.mobile.list_subjects import SubjectList
+from octodiary.types.myschool.mobile.marks import Marks
+from octodiary.types.myschool.mobile.notifications import Notification
+from octodiary.types.myschool.mobile.parallel_curriculum import ParallelCurriculum
+from octodiary.types.myschool.mobile.periods_schedule import PeriodSchedule
+from octodiary.types.myschool.mobile.person_data import PersonData
+from octodiary.types.myschool.mobile.rating import RatingRankClass, RatingRankShort, RatingRankSubject
+from octodiary.types.myschool.mobile.short_homeworks import ShortHomeworks
+from octodiary.types.myschool.mobile.short_subject_marks import ShortSubjectMarks
+from octodiary.types.myschool.mobile.subject_marks_for_subject import SubjectMarksForSubject
+from octodiary.types.myschool.mobile.user_childrens import UserChildrens
+from octodiary.types.myschool.mobile.user_settings import UserSettings
+from octodiary.types.myschool.mobile.users_profile_info import ProfileInfo
 
 __all__ = [
     "EventsResponse",

@@ -4,11 +4,11 @@
 #           https://github.com/OctoDiary
 
 from datetime import date, datetime
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import Field
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class Teacher(Type):
@@ -37,7 +37,7 @@ class Value(Type):
 class Mark(Type):
     id: Optional[int] = None
     value: Optional[str] = None
-    values: Optional[List[Value]] = []
+    values: Optional[list[Value]] = []
     comment: Optional[str] = None
     weight: Optional[int] = None
     point_date: Optional[Any] = None
@@ -45,7 +45,7 @@ class Mark(Type):
     comment_exists: Optional[bool] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    criteria: Optional[List] = []
+    criteria: Optional[list] = []
     is_exam: Optional[bool] = None
     is_point: Optional[bool] = None
     original_grade_system_type: Optional[str] = None
@@ -65,7 +65,7 @@ class Item(Type):
     file_size: Optional[int] = None
     progress: Optional[Any] = None
     status: Optional[Any] = None
-    urls: Optional[List[Url]] = []
+    urls: Optional[list[Url]] = []
     average_rating: Optional[Any] = None
     views: Optional[Any] = None
     class_level_ids: Optional[Any] = None
@@ -91,16 +91,16 @@ class Material(Type):
     type_name: Optional[str] = None
     action_id: Optional[int] = None
     action_name: Optional[str] = None
-    items: Optional[List[Item]] = []
+    items: Optional[list[Item]] = []
 
 
 class LessonHomework(Type):
     homework: Optional[str] = None
-    materials: Optional[List[Material]] = []
+    materials: Optional[list[Material]] = []
     homework_entry_student_id: Optional[int] = None
     homework_id: Optional[int] = None
     homework_entry_id: Optional[int] = None
-    attachments: Optional[List] = []
+    attachments: Optional[list] = []
     homework_created_at: Optional[datetime] = None
     homework_updated_at: Optional[datetime] = None
     is_done: Optional[bool] = None
@@ -112,9 +112,9 @@ class LessonHomework(Type):
 class ThemeFrame(Type):
     id: Optional[int] = None
     title: Optional[str] = None
-    theme_integration_id: int = Field(..., alias='themeIntegrationId')
+    theme_integration_id: int = Field(..., alias="themeIntegrationId")
     average_mark: Optional[str] = None
-    theme_frames: Optional[List["ThemeFrame"]] = []
+    theme_frames: Optional[list["ThemeFrame"]] = []
     oge_task_name: Optional[Any] = None
     ege_task_name: Optional[Any] = None
 
@@ -122,18 +122,18 @@ class ThemeFrame(Type):
 class Theme(Type):
     id: Optional[Any] = None
     title: Optional[Any] = None
-    theme_integration_id: int = Field(..., alias='themeIntegrationId')
+    theme_integration_id: int = Field(..., alias="themeIntegrationId")
     average_mark: Optional[str] = None
-    theme_frames: Optional[List[ThemeFrame]] = None
+    theme_frames: Optional[list[ThemeFrame]] = None
     oge_task_name: Optional[Any] = None
     ege_task_name: Optional[Any] = None
 
 
 class Details(Type):
-    content: Optional[List] = []
-    materials: Optional[List] = []
+    content: Optional[list] = []
+    materials: Optional[list] = []
     theme: Optional[Theme] = None
-    lesson_id: int = Field(..., alias='lessonId')
+    lesson_id: int = Field(..., alias="lessonId")
     lesson_topic: Optional[str] = None
 
 
@@ -152,13 +152,13 @@ class LessonScheduleItems(Type):
     room_number: Optional[str] = None
     room_name: Optional[str] = None
     building_name: Optional[str] = None
-    marks: Optional[List[Mark]] = None
+    marks: Optional[list[Mark]] = None
     created_date_time: Optional[datetime] = None
     is_missed_lesson: Optional[bool] = None
     lesson_type: Optional[str] = None
     field_name: Optional[Any] = None
     comment: Optional[Any] = None
-    lesson_homeworks: Optional[List[LessonHomework]] = None
+    lesson_homeworks: Optional[list[LessonHomework]] = None
     homework_to_give: Optional[Any] = None
     details: Optional[Details] = None
     esz_field_id: Optional[Any] = None

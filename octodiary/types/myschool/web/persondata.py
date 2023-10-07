@@ -3,11 +3,11 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import Field
 
-from ...model import EveryType, Type
+from octodiary.types.model import EveryType, Type
 
 
 class Contact(Type):
@@ -42,7 +42,7 @@ class Class(Type):
     name: Optional[str] = None
     organization_id: Optional[int] = None
     building_id: Optional[int]
-    staff_ids: Optional[List[int]]
+    staff_ids: Optional[list[int]]
     academic_year_id: Optional[int] = None
     open_at: Optional[str] = None
     close_at: Optional[str]
@@ -88,7 +88,7 @@ class EducationItem(Type):
     updated_by: Optional[Any] = None
     created_at: Optional[str] = None
     updated_at: Optional[Any] = None
-    class_: Class = Field(..., alias='class')
+    class_: Class = Field(..., alias="class")
     education_form: Optional[EveryType] = None
     financing_type: Optional[EveryType] = None
     deduction_reason: Optional[Any] = None
@@ -117,13 +117,13 @@ class AgentPerson(Type):
     created_at: Optional[str] = None
     updated_at: Optional[Any] = None
     addresses: Optional[Any] = None
-    documents: Optional[List] = None
-    contacts: Optional[List[Contact]] = None
+    documents: Optional[list] = None
+    contacts: Optional[list[Contact]] = None
     preventions: Optional[Any] = None
     categories: Optional[Any] = None
     agents: Optional[Any] = None
     children: Optional[Any] = None
-    education: Optional[List[EducationItem]] = None
+    education: Optional[list[EducationItem]] = None
     citizenship: Optional[Any] = None
     validation_errors: Optional[Any] = None
 
@@ -190,12 +190,12 @@ class PersonData(Type):
     created_at: Optional[str] = None
     updated_at: Optional[Any] = None
     addresses: Optional[Any] = None
-    documents: Optional[List[Document]] = None
-    contacts: Optional[List[Contact]] = None
+    documents: Optional[list[Document]] = None
+    contacts: Optional[list[Contact]] = None
     preventions: Optional[Any] = None
     categories: Optional[Any] = None
     agents: Optional[Any] = None
-    children: Optional[List[Children]] = None
+    children: Optional[list[Children]] = None
     education: Optional[Any] = None
     citizenship: Optional[Any] = None
     validation_errors: Optional[Any] = None

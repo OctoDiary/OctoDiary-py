@@ -5,8 +5,8 @@
 
 from typing import Any, Optional
 
-from .persondata import EveryType
-from ...model import Type
+from octodiary.types.model import Type
+from octodiary.types.myschool.web.persondata import EveryType
 
 
 class UserContact(Type):

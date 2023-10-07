@@ -5,7 +5,7 @@
 
 from typing import Optional
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class AcademicYear(Type):

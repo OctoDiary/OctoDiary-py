@@ -4,9 +4,9 @@
 #           https://github.com/OctoDiary
 
 import datetime
-from typing import List, Optional
+from typing import Optional
 
-from ...model import Type
+from octodiary.types.model import Type
 
 
 class PayloadItem(Type):
@@ -16,11 +16,11 @@ class PayloadItem(Type):
     date: Optional[datetime.date] = None
     date_assigned_on: Optional[str] = None
     homework_entry_student_id: Optional[int] = None
-    materials_count: Optional[List] = None
+    materials_count: Optional[list] = None
     has_written_answer: Optional[bool] = None
     is_done: Optional[bool] = None
     type: Optional[str] = None
 
 
 class ShortHomeworks(Type):
-    payload: Optional[List[PayloadItem]] = None
+    payload: Optional[list[PayloadItem]] = None
