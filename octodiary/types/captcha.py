@@ -126,11 +126,13 @@ class Captcha(Type):
 
         :return: The voice data as bytes.
         """
-        return await self.api_session.get(
-            url=self.__CAPTCHA_VOICE_URL__,
-            headers={
-                "captchasession": self._session
-            }
+        return await (
+            await self.api_session.get(
+                url=self.__CAPTCHA_VOICE_URL__,
+                headers={
+                    "captchasession": self._session
+                }
+            )
         ).content.read()
 
     def get_voice(self) -> bytes:
