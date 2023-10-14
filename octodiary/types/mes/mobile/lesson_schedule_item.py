@@ -112,7 +112,7 @@ class LessonHomework(Type):
 class ThemeFrame(Type):
     id: Optional[int] = None
     title: Optional[str] = None
-    theme_integration_id: int = Field(..., alias="themeIntegrationId")
+    theme_integration_id: int = Field(None, alias="themeIntegrationId")
     average_mark: Optional[str] = None
     theme_frames: Optional[list["ThemeFrame"]] = []
     oge_task_name: Optional[Any] = None
@@ -122,7 +122,7 @@ class ThemeFrame(Type):
 class Theme(Type):
     id: Optional[Any] = None
     title: Optional[Any] = None
-    theme_integration_id: int = Field(..., alias="themeIntegrationId")
+    theme_integration_id: int = Field(None, alias="themeIntegrationId")
     average_mark: Optional[str] = None
     theme_frames: Optional[list[ThemeFrame]] = None
     oge_task_name: Optional[Any] = None
@@ -133,7 +133,7 @@ class Details(Type):
     content: Optional[list] = []
     materials: Optional[list] = []
     theme: Optional[Theme] = None
-    lesson_id: int = Field(..., alias="lessonId")
+    lesson_id: Optional[int] = Field(None, alias="lessonId")
     lesson_topic: Optional[str] = None
 
 
