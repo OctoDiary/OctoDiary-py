@@ -3,11 +3,8 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from octodiary.asyncApi import mes, myschool
-from octodiary.asyncApi.base import AsyncBaseApi
+from octodiary.syncApi.mes.mobile import SyncMobileAPI
 
 __all__ = [
-    "AsyncBaseApi",
-    "myschool",
-    "mes"
+    "SyncMobileAPI",
 ]

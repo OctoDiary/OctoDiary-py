@@ -27,7 +27,7 @@ from octodiary.types.myschool.web import (
     WebFamilyProfile,
     WebOrganizations,
 )
-from octodiary.urls import URLs
+from octodiary.urls import MySchoolURLs
 
 
 class AsyncWebAPI(AsyncBaseApi):
@@ -48,12 +48,12 @@ class AsyncWebAPI(AsyncBaseApi):
         """
         return (
             await self.get(
-                url=URLs.LOGIN.AUTH_CALLBACK,
+                url=MySchoolURLs.LOGIN.AUTH_CALLBACK,
                 required_token=False, return_raw_response=True,
                 params={
                     "code": (
                         await self.post(
-                            url=URLs.API_SESSIONS,
+                            url=MySchoolURLs.API_SESSIONS,
                             required_token=False,
                             json={
                                 "login": username,
@@ -79,7 +79,7 @@ class AsyncWebAPI(AsyncBaseApi):
                         (
                             await (
                                 await self.__session_login.post(
-                                    URLs.LOGIN.FILL_MFA
+                                    MySchoolURLs.LOGIN.FILL_MFA
                                 )
                             ).json()
                         ).get("redirect_url", "")
@@ -97,7 +97,7 @@ class AsyncWebAPI(AsyncBaseApi):
                 return token_request.cookies.get("aupd_token", None).value
             case "GRANT_SCOPE_ACCESS":
                 response = await self.__session_login.post(
-                    url=URLs.LOGIN.ALLOW_SCOPE
+                    url=MySchoolURLs.LOGIN.ALLOW_SCOPE
                 )
                 resp_json = await response.json()
                 return await self.handle_action(
@@ -140,7 +140,7 @@ class AsyncWebAPI(AsyncBaseApi):
         self.__session_login = ClientSession(cookie_jar=self.__cookie, headers=self.headers(False))
         one: str = await (
             await self.__session_login.get(
-                URLs.LOGIN.AUTHEDU_ESIA_LOGIN,
+                MySchoolURLs.LOGIN.AUTHEDU_ESIA_LOGIN,
                 allow_redirects=False,
             )
         ).text()
@@ -148,10 +148,10 @@ class AsyncWebAPI(AsyncBaseApi):
             re.findall(r"0;url=(.*?)\">", one)[0]
         )
         await self.__session_login.get(
-            URLs.LOGIN.GOSUSLUGI_OAUTH2_CONFIG
+            MySchoolURLs.LOGIN.GOSUSLUGI_OAUTH2_CONFIG
         )
         login_response = await self.__session_login.post(
-            URLs.LOGIN.GOSUSLUGI_API_LOGIN,
+            MySchoolURLs.LOGIN.GOSUSLUGI_API_LOGIN,
             json={
                 "login": username,
                 "password": password
@@ -176,7 +176,7 @@ class AsyncWebAPI(AsyncBaseApi):
         """
         mfa_method = "otp" if self._mfa_details["type"] == "SMS" else "totp"
         enter_mfa = await self.__session_login.post(
-            url=URLs.LOGIN.ENTER_MFA.format(
+            url=MySchoolURLs.LOGIN.ENTER_MFA.format(
                 METHOD=mfa_method,
                 CODE=str(code)
             )
@@ -195,7 +195,7 @@ class AsyncWebAPI(AsyncBaseApi):
             UserInfo
 
         """
-        return await self.get(url=URLs.USER_INFO, model=UserInfo)
+        return await self.get(url=MySchoolURLs.USER_INFO, model=UserInfo)
 
     async def refresh_token(self, role_id: Optional[int] = None, subsystem: Optional[int] = None) -> str:
         """
@@ -209,7 +209,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.REFRESH_TOKEN,
+            url=MySchoolURLs.REFRESH_TOKEN,
             params={"roleId": role_id, "subsystem": subsystem},
             return_raw_text=True
         )
@@ -236,7 +236,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.SYSTEM_MESSAGES,
+            url=MySchoolURLs.SYSTEM_MESSAGES,
             custom_headers={
                 "Accept": "application/json",
                 "Profile-Id": profile_id,
@@ -254,7 +254,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.post(
-            url=URLs.API_SESSIONS2,
+            url=MySchoolURLs.API_SESSIONS2,
             custom_headers={
                 "auth_token": self.token,
                 "Content-Type": "application/json;charset=utf-8",
@@ -281,7 +281,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.ACADEMIC_YEARS,
+            url=MySchoolURLs.ACADEMIC_YEARS,
             custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
@@ -311,7 +311,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.USER,
+            url=MySchoolURLs.USER,
             custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
@@ -348,7 +348,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.STUDENT_PROFILES,
+            url=MySchoolURLs.STUDENT_PROFILES,
             custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
@@ -381,7 +381,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.WEB.FAMILY_PROFILE,
+            url=MySchoolURLs.WEB.FAMILY_PROFILE,
             custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
@@ -404,7 +404,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.PERSON_DATA.format(person_id=person_id),
+            url=MySchoolURLs.PERSON_DATA.format(person_id=person_id),
             custom_headers={
                 "x-mes-subsystem": "headerweb",
             },
@@ -419,7 +419,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.ROLES,
+            url=MySchoolURLs.ROLES,
             model=Role, is_list=True, required_token=False
         )
 
@@ -445,7 +445,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.EVENTS,
+            url=MySchoolURLs.EVENTS,
             custom_headers={
                 "X-Mes-Subsystem": "familyweb",
                 "X-Mes-Role": mes_role,
@@ -471,7 +471,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.CHILDRENS,
+            url=MySchoolURLs.CHILDRENS,
             model=UserChildren,
             params={
                 "sso_id": sso_id,
@@ -487,7 +487,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.USER_CONTACTS,
+            url=MySchoolURLs.USER_CONTACTS,
             model=UserContact,
             params={
                 "source": "CONTINGENT",
@@ -515,7 +515,7 @@ class AsyncWebAPI(AsyncBaseApi):
 
         """
         return await self.get(
-            url=URLs.ORGANIZATIONS,
+            url=MySchoolURLs.ORGANIZATIONS,
             model=WebOrganizations,
             params={
                 "page": page,

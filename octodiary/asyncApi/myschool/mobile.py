@@ -34,7 +34,7 @@ from octodiary.types.myschool.mobile import (
     UserSettings,
 )
 from octodiary.types.myschool.web import SessionUserInfo
-from octodiary.urls import URLs
+from octodiary.urls import MySchoolURLs
 
 
 class AsyncMobileAPI(AsyncBaseApi):
@@ -46,12 +46,12 @@ class AsyncMobileAPI(AsyncBaseApi):
         """Авторизоваться и получить токен напрямую через обычный логин и пароль."""
         return (
             await self.get(
-                url=URLs.LOGIN.AUTH_CALLBACK,
+                url=MySchoolURLs.LOGIN.AUTH_CALLBACK,
                 required_token=False, return_raw_response=True,
                 params={
                     "code": (
                         await self.post(
-                            url=URLs.API_SESSIONS,
+                            url=MySchoolURLs.API_SESSIONS,
                             required_token=False,
                             json={
                                 "login": username,
@@ -77,7 +77,7 @@ class AsyncMobileAPI(AsyncBaseApi):
                         (
                             await (
                                 await self.__session_login.post(
-                                    url=URLs.LOGIN.FILL_MFA
+                                    url=MySchoolURLs.LOGIN.FILL_MFA
                                 )
                             ).json()
                         ).get("redirect_url", "")
@@ -96,7 +96,7 @@ class AsyncMobileAPI(AsyncBaseApi):
                 return token_request.cookies.get("aupd_token", None).value
             case "GRANT_SCOPE_ACCESS":
                 response = await self.__session_login.post(
-                    url=URLs.LOGIN.ALLOW_SCOPE
+                    url=MySchoolURLs.LOGIN.ALLOW_SCOPE
                 )
                 resp_json = await response.json()
                 return await self.handle_action(
@@ -133,7 +133,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         self.__session_login = ClientSession(cookie_jar=self.__cookie, headers=self.headers(False))
         one: str = await (
             await self.__session_login.get(
-                url=URLs.LOGIN.AUTHEDU_ESIA_LOGIN,
+                url=MySchoolURLs.LOGIN.AUTHEDU_ESIA_LOGIN,
                 allow_redirects=False,
             )
         ).text()
@@ -141,10 +141,10 @@ class AsyncMobileAPI(AsyncBaseApi):
             re.findall(r"0\;url\=(.*?)\">", one)[0]
         )
         await self.__session_login.get(
-            url=URLs.LOGIN.GOSUSLUGI_OAUTH2_CONFIG
+            url=MySchoolURLs.LOGIN.GOSUSLUGI_OAUTH2_CONFIG
         )
         login_response = await self.__session_login.post(
-            url=URLs.LOGIN.GOSUSLUGI_API_LOGIN,
+            url=MySchoolURLs.LOGIN.GOSUSLUGI_API_LOGIN,
             json={
                 "login": username,
                 "password": password
@@ -161,7 +161,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         """2 этап получения API-TOKEN прохождение MFA: ввод кода"""
         mfa_method = "otp" if self._mfa_details["type"] == "SMS" else "totp"
         enter_mfa = await self.__session_login.post(
-            url=URLs.LOGIN.ENTER_MFA.format(METHOD=mfa_method, CODE=str(code)),
+            url=MySchoolURLs.LOGIN.ENTER_MFA.format(METHOD=mfa_method, CODE=str(code)),
         )
         enter_mfa_json = await enter_mfa.json()
         return await self.handle_action(
@@ -175,7 +175,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить информацию о профиле
         """
         return await self.get(
-            url=URLs.PROFILE_INFO,
+            url=MySchoolURLs.PROFILE_INFO,
             custom_headers={
                 "partner-source-id": "MOBILE"
             },
@@ -188,7 +188,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить профиль пользователя
         """
         return await self.get(
-            url=URLs.MOBILE.FAMILY_PROFILE,
+            url=MySchoolURLs.MOBILE.FAMILY_PROFILE,
             custom_headers={
                 "x-mes-subsystem": "familymp",
                 "client-type": "diary-mobile",
@@ -207,7 +207,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить настройки приложения пользователя
         """
         return await self.get(
-            url=URLs.USER_SETTINGS,
+            url=MySchoolURLs.USER_SETTINGS,
             params={
                 "name": name,
                 "subsystem_id": subsystem_id,
@@ -231,7 +231,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Изменить настройки приложения пользователя
         """
         await self.put(
-            url=URLs.USER_SETTINGS,
+            url=MySchoolURLs.USER_SETTINGS,
             params={
                 "name": name,
                 "subsystem_id": subsystem_id,
@@ -255,7 +255,7 @@ class AsyncMobileAPI(AsyncBaseApi):
     ) -> EventsResponse:
         """Получите расписание."""
         return await self.get(
-            url=URLs.EVENTS,
+            url=MySchoolURLs.EVENTS,
             custom_headers={
                 "x-mes-subsystem": "familymp",
                 "client-type": "diary-mobile",
@@ -283,7 +283,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить список домашних заданий
         """
         return await self.get(
-            url=URLs.MOBILE.HOMEWORKS_SHORT,
+            url=MySchoolURLs.MOBILE.HOMEWORKS_SHORT,
             params={
                 "student_id": student_id,
                 "from": from_date.strftime("%Y-%m-%d"),
@@ -310,7 +310,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить оценки
         """
         return await self.get(
-            url=URLs.MOBILE.MARKS,
+            url=MySchoolURLs.MOBILE.MARKS,
             params={
                 "student_id": student_id,
                 "from": from_date.strftime("%Y-%m-%d"),
@@ -337,7 +337,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         - что это: каникулы, выходной, рабочий день
         """
         return await self.get(
-            url=URLs.MOBILE.PERIODS_SCHEDULES,
+            url=MySchoolURLs.MOBILE.PERIODS_SCHEDULES,
             params={
                 "student_id": student_id,
                 "from": from_date.strftime("%Y-%m-%d"),
@@ -361,7 +361,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить оценки и ср.баллы по предметам за период времени
         """
         return await self.get(
-            url=URLs.MOBILE.SUBJECT_MARKS_SHORT,
+            url=MySchoolURLs.MOBILE.SUBJECT_MARKS_SHORT,
             params={
                 "student_id": student_id,
             },
@@ -382,7 +382,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить список предметов
         """
         return await self.get(
-            url=URLs.MOBILE.SUBJECTS_LIST,
+            url=MySchoolURLs.MOBILE.SUBJECTS_LIST,
             model=SubjectList,
             is_list=True,
             params={
@@ -397,6 +397,7 @@ class AsyncMobileAPI(AsyncBaseApi):
 
     async def get_programs_parallel_curriculum(
             self,
+            id: int,
             profile_id: int,
             student_id: int,
     ) -> ParallelCurriculum:
@@ -404,7 +405,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить программу обучения по текущему классу
         """
         return await self.get(
-            url=URLs.MOBILE.PROGRAMS_PARALLEL_CURRICULUM,
+            url=MySchoolURLs.MOBILE.PROGRAMS_PARALLEL_CURRICULUM(ID=id),
             model=ParallelCurriculum,
             is_list=True,
             params={
@@ -426,7 +427,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить подробную информацию о пользователе
         """
         return await self.get(
-            url=URLs.MOBILE.PERSON_DATA.format(person_id=person_id),
+            url=MySchoolURLs.MOBILE.PERSON_DATA.format(person_id=person_id),
             model=PersonData,
             custom_headers={
                 "x-mes-subsystem": "familymp",
@@ -443,7 +444,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить детей пользователя
         """
         return await self.get(
-            url=URLs.CHILDRENS,
+            url=MySchoolURLs.CHILDRENS,
             params={
                 "person_id": person_id,
             },
@@ -463,7 +464,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить уведомления пользователя
         """
         return await self.get(
-            url=URLs.MOBILE.NOTIFICATIONS,
+            url=MySchoolURLs.MOBILE.NOTIFICATIONS,
             model=Notification,
             is_list=True,
             params={
@@ -486,7 +487,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить оценки по предмету
         """
         return await self.get(
-            url=URLs.MOBILE.SUBJECT_MARKS,
+            url=MySchoolURLs.MOBILE.SUBJECT_MARKS,
             model=SubjectMarksForSubject,
             params={
                 "student_id": student_id,
@@ -510,7 +511,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить информацию об уроке
         """
         return await self.get(
-            url=URLs.MOBILE.LESSON_SCHEDULE_ITEMS.format(lesson_id=lesson_id),
+            url=MySchoolURLs.MOBILE.LESSON_SCHEDULE_ITEMS.format(lesson_id=lesson_id),
             params={
                 "student_id": student_id,
                 "type": type
@@ -534,7 +535,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить общий рейтинг класса
         """
         return await self.get(
-            url=URLs.RATING_RANK_CLASS,
+            url=MySchoolURLs.RATING_RANK_CLASS,
             model=RatingRankClass, is_list=True,
             custom_headers={
                 "x-mes-subsystem": "familymp",
@@ -559,7 +560,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить общий рейтинг класса
         """
         return await self.get(
-            url=URLs.RATING_RANK_SHORT,
+            url=MySchoolURLs.RATING_RANK_SHORT,
             model=RatingRankShort, is_list=True,
             custom_headers={
                 "x-mes-subsystem": "familymp",
@@ -583,7 +584,7 @@ class AsyncMobileAPI(AsyncBaseApi):
         Получить рейтинг по предметам
         """
         return await self.get(
-            url=URLs.RATING_RANK_SUBJECTS,
+            url=MySchoolURLs.RATING_RANK_SUBJECTS,
             model=RatingRankSubject, is_list=True,
             custom_headers={
                 "x-mes-subsystem": "familymp",

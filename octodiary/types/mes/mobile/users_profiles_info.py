@@ -3,11 +3,9 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from octodiary.asyncApi import mes, myschool
-from octodiary.asyncApi.base import AsyncBaseApi
+from octodiary.types.model import Type
 
-__all__ = [
-    "AsyncBaseApi",
-    "myschool",
-    "mes"
-]
+
+class UsersProfilesInfo(Type):
+    id: int
+    type: str

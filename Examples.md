@@ -209,6 +209,7 @@ async def mobile_api():
 
     # получить программу обучения на текущий учебный год
     parallel_curriculum = await api.get_programs_parallel_curriculum(
+        id=0, # <PARALLEL-CURRICULUM-ID>
         student_id=0, # <STUDENT-ID>
         profile_id=user_profile_info[0].id
     )
@@ -242,7 +243,8 @@ async def main():
     await web_api()
     await mobile_api()
 
-run(main())
+if __name__ == "__main__":
+    run(main())
 ```
 
 </details>
@@ -443,6 +445,7 @@ def mobile_api():
 
     # получить программу обучения на текущий учебный год
     parallel_curriculum = api.get_programs_parallel_curriculum(
+        id=0, # <PARALLEL-CURRICULUM-ID>
         student_id=0, # <STUDENT-ID>
         profile_id=user_profile_info[0].id
     )
@@ -485,4 +488,280 @@ if __name__ == "__main__":
 ---
 
 ## <p align="center"><img width="96" height="96" src="https://is3-ssl.mzstatic.com/image/thumb/Purple114/v4/57/39/7b/57397bea-0eb8-d0d3-ad57-c170359343af/source/200x200bb.jpg" alt="mesh"/></p>
-> Скоро...
+>
+
+
+<details>
+    <summary><img width="40" height="40" src="https://img.icons8.com/fluency/64/python.png" alt="python"/> <h1>Async</h1></summary>
+
+``` python
+from asyncio import run
+
+from datetime import date, datetime
+
+from octodiary.asyncApi.mes import AsyncMobileAPI
+from octodiary.types.enter_sms_code import EnterSmsCode
+
+
+async def web_api():
+    """
+    API методы и запросы, которые делают web-сайты school.mos.ru и dnevnik.mos.ru
+
+    Обёртка WebAPI еще не сделана.
+    """
+
+
+async def mobile_api():
+    """
+    API методы и запросы, которые делает приложение "Дневник МЭШ" для получения данных
+    """
+
+    api = AsyncMobileAPI()
+
+    # авторизовываемся, получаем токен и сохраняем его
+    sms_code: EnterSmsCode = await api.login("login", "password")
+    code = input("SMS-Code: ")
+    api.token = await sms_code.async_enter_code(code)
+    
+    # получаем ID профиля
+    profile_id = (await api.get_users_profiles_info())[0].id
+
+    # Получаем инфо о профиле и сохраняем некоторые важные данные, которые будут нужны
+    profile = await api.get_family_profile(profile_id=profile_id)
+    mes_role = profile.profile.type
+    person_id = profile.children[0].contingent_guid
+    student_id = profile.children[0].id
+    contract_id = profile.children[0].contract_id
+
+    # Получаем расписание событий за определенный промежуток времени
+    events = await api.get_events(
+        person_id=person_id,
+        mes_role=mes_role,
+        begin_date=date(2023, 9, 4), # начало промежутка времени
+        end_date=date(2023, 9, 10), # конец
+    )
+
+    # Получим подробную информацию об первом уроке или занятии
+    lesson_info = await api.get_schedule_item(
+        profile_id=profile_id,
+        lesson_id=events.response[0].id,
+        student_id=student_id,
+        type=events.response.[0].source
+    )
+    
+
+    # Получаем инфо о балансе
+    balance_info = await api.get_status(
+        profile_id=profile_id,
+        contract_id=contract_id
+    )
+    print("Баланс:", balance_info.students[0].balance / 100, "₽")
+
+    # Информация об оценках
+    marks = await api.get_marks(
+        profile_id=profile_id,
+        student_id=student_id,
+        from_date=date(2023, 9, 4), # начало промежутка времени
+        to_date=date(2023, 9, 10), # конец
+    )
+
+    # Получить информацию о домашних заданиях за определенный промежуток времени
+    homeworks = await api.get_homeworks_short(
+        profile_id=profile_id,
+        student_id=student_id,
+        from_date=date(2023, 9, 4), # начало промежутка времени
+        to_date=date(2023, 9, 10), # конец
+    )
+
+
+    # Информация об оценках и ср.баллам по предметам
+    subject_marks = await api.get_subject_marks_short(
+        profile_id=profile_id,
+        student_id=student_id
+    )
+
+
+    # Информация о посещениях (время входа, выхода, и т.д.)
+    visits = await api.get_visits(
+        profile_id=profile_id,
+        student_id=student_id,
+        contract_id=contract_id,
+        from_date=date(2023, 9, 4), # начало промежутка времени
+        to_date=date(2023, 9, 10), # конец
+    )
+
+    
+    # Список уведомлений
+    notifications = await api.get_notifications(
+        profile_id=profile_id,
+        student_id=student_id
+    )
+
+    
+    # Информация о покупках в школе, буфете, и т.д.
+    day_balance_info = await api.get_day_balance_info(
+        profile_id=profile_id,
+        contract_id=contract_id,
+    )
+
+
+    # Получить информацию о школе
+    school_info = await api.get_school_info(
+        profile_id=profile_id,
+        school_id=profile.children[0].school.id,
+        class_unit_id=profile.children[0].class_unit_id
+    )
+
+    # Подробная информация о профиле
+    person_data = await api.get_person_data(
+        person_id=person_id,
+        profile_id=profile_id
+    )
+
+
+async def main():
+    await web_api()
+    await mobile_api()
+
+if __name__ == "__main__":
+    run(main())
+```
+
+</details>
+
+
+<details>
+    <summary><img width="40" height="40" src="https://img.icons8.com/fluency/64/python.png" alt="python"/> <h1>Sync</h1></summary>
+
+``` python
+from octodiary.syncApi.mes import SyncMobileAPI
+from octodiary.types.enter_sms_code import EnterSmsCode
+
+from datetime import date, datetime
+
+
+def web_api():
+    """
+    API методы и запросы, которые делают web-сайты school.mos.ru и dnevnik.mos.ru
+
+    Обёртка WebAPI еще не сделана.
+    """
+
+
+def mobile_api():
+    """
+    API методы и запросы, которые делает приложение "Дневник Моя Школа" для получения данных
+    """
+
+    api = AsyncMobileAPI()
+
+    # авторизовываемся, получаем токен и сохраняем его
+    sms_code: EnterSmsCode = api.login("login", "password")
+    code = input("SMS-Code: ")
+    api.token = sms_code.async_enter_code(code)
+    
+    # получаем ID профиля
+    profile_id = (api.get_users_profiles_info())[0].id
+
+    # Получаем инфо о профиле и сохраняем некоторые важные данные, которые будут нужны
+    profile = api.get_family_profile(profile_id=profile_id)
+    mes_role = profile.profile.type
+    person_id = profile.children[0].contingent_guid
+    student_id = profile.children[0].id
+    contract_id = profile.children[0].contract_id
+
+    # Получаем расписание событий за определенный промежуток времени
+    events = api.get_events(
+        person_id=person_id,
+        mes_role=mes_role,
+        begin_date=date(2023, 9, 4), # начало промежутка времени
+        end_date=date(2023, 9, 10), # конец
+    )
+
+    # Получим подробную информацию об первом уроке или занятии
+    lesson_info = api.get_schedule_item(
+        profile_id=profile_id,
+        lesson_id=events.response[0].id,
+        student_id=student_id,
+        type=events.response.[0].source
+    )
+    
+
+    # Получаем инфо о балансе
+    balance_info = api.get_status(
+        profile_id=profile_id,
+        contract_id=contract_id
+    )
+    print("Баланс:", balance_info.students[0].balance / 100, "₽")
+
+    # Информация об оценках
+    marks = api.get_marks(
+        profile_id=profile_id,
+        student_id=student_id,
+        from_date=date(2023, 9, 4), # начало промежутка времени
+        to_date=date(2023, 9, 10), # конец
+    )
+
+    # Получить информацию о домашних заданиях за определенный промежуток времени
+    homeworks = api.get_homeworks_short(
+        profile_id=profile_id,
+        student_id=student_id,
+        from_date=date(2023, 9, 4), # начало промежутка времени
+        to_date=date(2023, 9, 10), # конец
+    )
+
+
+    # Информация об оценках и ср.баллам по предметам
+    subject_marks = api.get_subject_marks_short(
+        profile_id=profile_id,
+        student_id=student_id
+    )
+
+
+    # Информация о посещениях (время входа, выхода, и т.д.)
+    visits = api.get_visits(
+        profile_id=profile_id,
+        student_id=student_id,
+        contract_id=contract_id,
+        from_date=date(2023, 9, 4), # начало промежутка времени
+        to_date=date(2023, 9, 10), # конец
+    )
+
+    
+    # Список уведомлений
+    notifications = api.get_notifications(
+        profile_id=profile_id,
+        student_id=student_id
+    )
+
+    
+    # Информация о покупках в школе, буфете, и т.д.
+    day_balance_info = api.get_day_balance_info(
+        profile_id=profile_id,
+        contract_id=contract_id,
+    )
+
+
+    # Получить информацию о школе
+    school_info = api.get_school_info(
+        profile_id=profile_id,
+        school_id=profile.children[0].school.id,
+        class_unit_id=profile.children[0].class_unit_id
+    )
+
+    # Подробная информация о профиле
+    person_data = api.get_person_data(
+        person_id=person_id,
+        profile_id=profile_id
+    )
+
+
+def main():
+    web_api()
+    mobile_api()
+
+if __name__ == "__main__":
+    main()
+```
+
+</details>

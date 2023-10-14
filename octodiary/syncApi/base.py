@@ -3,6 +3,7 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
+import hashlib
 from datetime import date as Date
 from datetime import datetime
 from typing import Optional, TypeVar, Union
@@ -59,6 +60,59 @@ class SyncBaseApi:
         HEADERS.update(custom_headers or {})
         return HEADERS
 
+
+    @staticmethod
+    def _resolve_proof_of_work(proof_of_work: str) -> str:
+        """
+        Resolves and returns a hashcash stamp.
+
+        Args:
+            nbits: Number of leading zero bits the stamp must have.
+            hcheader: Pre-baked hashcash header sans counter field eg,
+                1:15:231012184839:63685480-9484-45cd-87b4-19a87bded3f6::VO5fn4nNM0zHZfSoJ1XBaA==:
+
+        Returns:
+            Hashcash stamp string.
+        """
+        def check_hash_for_cash(digest_bytes, zero_bits):
+            bit_counter = 0
+
+            for hash_byte in digest_bytes:
+                if bit_counter >= zero_bits:
+                    return True
+                bits_remain = zero_bits - bit_counter
+                if bits_remain >= 8:
+                    if hash_byte == 0x00:
+                        bit_counter += 8
+                        continue
+                    else:
+                        return False
+                else:
+                    for bit in range(bits_remain - 1, -1, -1):
+                        bit_counter += 1
+                        mask = 0x80 >> bit
+                        if hash_byte & mask:
+                            return False
+
+            return True
+
+        counter = 0
+        header_bytes = proof_of_work.encode()
+
+        while True:
+            counter_string = hex(counter)[2:]
+
+            if check_hash_for_cash(
+                hashlib.sha1(
+                    header_bytes + counter_string.encode()
+                ).digest(), 15
+            ):
+                break
+            counter += 1
+
+        return proof_of_work + counter_string
+
+
     @staticmethod
     def init_params(url: str, params: dict) -> str:
         boolean = {True: "true", False: "false"}
@@ -66,15 +120,15 @@ class SyncBaseApi:
                 f"{url}?" + "&".join(
             [
                 f"{X}={Y}" for X, Y in {
-                X: Y
-                if isinstance(Y, (str, float, int))
-                else boolean[Y]
-                if isinstance(Y, bool)
-                else "null"
-                if Y is None
-                else str(Y)
-                for X, Y in params.items()
-            }.items()
+                    X: Y
+                    if isinstance(Y, (str, float, int))
+                    else boolean[Y]
+                    if isinstance(Y, bool)
+                    else "null"
+                    if Y is None
+                    else str(Y)
+                    for X, Y in params.items()
+                }.items()
             ]
         )
         ) if params else url
@@ -162,7 +216,7 @@ class SyncBaseApi:
             self,
             url: str,
             custom_headers: Optional[dict] = None,
-            model: Optional[Type] = None,
+            model: Optional[type[Type]] = None,
             is_list: bool = False,
             return_json: bool = False,
             return_raw_text: bool = False,
@@ -196,7 +250,7 @@ class SyncBaseApi:
             custom_headers: Optional[dict] = None,
             json=None,
             data=None,
-            model: Optional[Type] = None,
+            model: Optional[type[Type]] = None,
             is_list: bool = False,
             return_json: bool = False,
             return_raw_text: bool = False,
@@ -231,7 +285,7 @@ class SyncBaseApi:
             custom_headers: Optional[dict] = None,
             json=None,
             data=None,
-            model: Optional[Type] = None,
+            model: Optional[type[Type]] = None,
             is_list: bool = False,
             return_json: bool = False,
             return_raw_text: bool = False,
@@ -266,7 +320,7 @@ class SyncBaseApi:
             custom_headers: Optional[dict] = None,
             json=None,
             data=None,
-            model: Optional[Type] = None,
+            model: Optional[type[Type]] = None,
             is_list: bool = False,
             return_json: bool = False,
             return_raw_text: bool = False,

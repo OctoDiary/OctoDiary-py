@@ -3,11 +3,9 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from octodiary.asyncApi import mes, myschool
-from octodiary.asyncApi.base import AsyncBaseApi
+from octodiary.types.mes import mobile, web
 
 __all__ = [
-    "AsyncBaseApi",
-    "myschool",
-    "mes"
+    "web",
+    "mobile"
 ]

@@ -60,7 +60,7 @@ class Contact(Type):
     type_id: Optional[int] = None
     data: Optional[str] = None
     default: Optional[bool] = None
-    type: Optional[Type] = None
+    type: Optional[EveryType] = None
     validation_state_id: Optional[int] = None
     validated_at: Optional[Any] = None
     validation_errors: Optional[Any] = None

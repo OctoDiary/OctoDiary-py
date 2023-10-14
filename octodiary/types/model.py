@@ -21,11 +21,13 @@ class Type(BaseModel):
 
         return {
             "_": type.__class__.__name__,
-            **{
-                attr: getattr(type, attr)
-                for attr in filter(lambda x: not x.startswith("_"), type.__dict__)
-                if getattr(type, attr) is not None
-            }
+            **(
+                {
+                    attr: getattr(type, attr)
+                    for attr in filter(lambda x: not x.startswith("_"), type.__dict__)
+                    if getattr(type, attr) is not None
+                } if hasattr(type, "__dict__") else {}
+            )
         }
 
     def __str__(self) -> str:

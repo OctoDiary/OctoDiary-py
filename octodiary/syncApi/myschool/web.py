@@ -28,7 +28,7 @@ from octodiary.types.myschool.web import (
     WebFamilyProfile,
     WebOrganizations,
 )
-from octodiary.urls import URLs
+from octodiary.urls import MySchoolURLs
 
 
 class SyncWebAPI(SyncBaseApi):
@@ -49,12 +49,12 @@ class SyncWebAPI(SyncBaseApi):
         """
         return (
             self.get(
-                url=URLs.LOGIN.AUTH_CALLBACK,
+                url=MySchoolURLs.LOGIN.AUTH_CALLBACK,
                 required_token=False, return_raw_response=True,
                 params={
                     "code": (
                         self.post(
-                            url=URLs.API_SESSIONS,
+                            url=MySchoolURLs.API_SESSIONS,
                             required_token=False,
                             json={
                                 "login": username,
@@ -81,7 +81,7 @@ class SyncWebAPI(SyncBaseApi):
                             self.session.get(
                                 self.__login_request(
                                     self.session.post(
-                                        URLs.LOGIN.FILL_MFA,
+                                        MySchoolURLs.LOGIN.FILL_MFA,
                                         cookies=self.__cookies
                                     )
                                 ).json().get("redirect_url", "")
@@ -97,7 +97,7 @@ class SyncWebAPI(SyncBaseApi):
             case "GRANT_SCOPE_ACCESS":
                 response = self.__login_request(
                     self.session.post(
-                        url=URLs.LOGIN.ALLOW_SCOPE
+                        url=MySchoolURLs.LOGIN.ALLOW_SCOPE
                     )
                 )
                 resp_json = response.json()
@@ -145,14 +145,14 @@ class SyncWebAPI(SyncBaseApi):
 
         one: str = self.__login_request(
             self.session.get(
-                URLs.LOGIN.AUTHEDU_ESIA_LOGIN,
+                MySchoolURLs.LOGIN.AUTHEDU_ESIA_LOGIN,
                 allow_redirects=False
             )
         ).text
         self.__login_request(self.session.get(re.findall(r"0;url=(.*?)\">", one)[0], cookies=self.__cookies))
-        self.__login_request(self.session.get(URLs.LOGIN.GOSUSLUGI_OAUTH2_CONFIG, cookies=self.__cookies))
+        self.__login_request(self.session.get(MySchoolURLs.LOGIN.GOSUSLUGI_OAUTH2_CONFIG, cookies=self.__cookies))
         login = self.__login_request(self.session.post(
-            url=URLs.LOGIN.GOSUSLUGI_API_LOGIN,
+            url=MySchoolURLs.LOGIN.GOSUSLUGI_API_LOGIN,
             json={
                 "login": username,
                 "password": password
@@ -179,7 +179,7 @@ class SyncWebAPI(SyncBaseApi):
         mfa_method = "otp" if self._mfa_details["type"] == "SMS" else "totp"
         enter_mfa = self.__login_request(
             self.session.post(
-                URLs.LOGIN.ENTER_MFA.format(METHOD=mfa_method, CODE=str(code)),
+                MySchoolURLs.LOGIN.ENTER_MFA.format(METHOD=mfa_method, CODE=str(code)),
                 cookies=self.__cookies
             )
         )
@@ -197,7 +197,7 @@ class SyncWebAPI(SyncBaseApi):
             UserInfo
 
         """
-        return self.get(url=URLs.USER_INFO, model=UserInfo)
+        return self.get(url=MySchoolURLs.USER_INFO, model=UserInfo)
 
     def refresh_token(self, role_id: Optional[int] = None, subsystem: Optional[int] = None) -> str:
         """
@@ -211,7 +211,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.REFRESH_TOKEN,
+            url=MySchoolURLs.REFRESH_TOKEN,
             params={"roleId": role_id, "subsystem": subsystem},
             return_raw_text=True
         )
@@ -238,7 +238,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.SYSTEM_MESSAGES,
+            url=MySchoolURLs.SYSTEM_MESSAGES,
             custom_headers={
                 "Accept": "application/json",
                 "Profile-Id": profile_id,
@@ -256,7 +256,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.post(
-            url=URLs.API_SESSIONS2,
+            url=MySchoolURLs.API_SESSIONS2,
             custom_headers={
                 "auth_token": self.token,
                 "Content-Type": "application/json;charset=utf-8",
@@ -283,7 +283,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.ACADEMIC_YEARS,
+            url=MySchoolURLs.ACADEMIC_YEARS,
             custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
@@ -313,7 +313,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.USER,
+            url=MySchoolURLs.USER,
             custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
@@ -350,7 +350,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.STUDENT_PROFILES,
+            url=MySchoolURLs.STUDENT_PROFILES,
             custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
@@ -383,7 +383,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.WEB.FAMILY_PROFILE,
+            url=MySchoolURLs.WEB.FAMILY_PROFILE,
             custom_headers={
                 "Profile-Id": profile_id,
                 "Profile-Type": profile_type,
@@ -406,7 +406,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.PERSON_DATA.format(person_id=person_id),
+            url=MySchoolURLs.PERSON_DATA.format(person_id=person_id),
             custom_headers={
                 "x-mes-subsystem": "headerweb",
             },
@@ -421,7 +421,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.ROLES,
+            url=MySchoolURLs.ROLES,
             model=Role, is_list=True, required_token=False
         )
 
@@ -447,7 +447,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.EVENTS,
+            url=MySchoolURLs.EVENTS,
             custom_headers={
                 "X-Mes-Subsystem": "familyweb",
                 "X-Mes-Role": mes_role,
@@ -473,7 +473,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.CHILDRENS,
+            url=MySchoolURLs.CHILDRENS,
             model=UserChildren,
             params={
                 "sso_id": sso_id,
@@ -489,7 +489,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.USER_CONTACTS,
+            url=MySchoolURLs.USER_CONTACTS,
             model=UserContact,
             params={
                 "source": "CONTINGENT",
@@ -517,7 +517,7 @@ class SyncWebAPI(SyncBaseApi):
 
         """
         return self.get(
-            url=URLs.ORGANIZATIONS,
+            url=MySchoolURLs.ORGANIZATIONS,
             model=WebOrganizations,
             params={
                 "page": page,
