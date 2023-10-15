@@ -3,6 +3,8 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
+from typing import Any
+
 from pydantic import Field
 
 from octodiary.types.model import EveryType, Type
@@ -16,8 +18,8 @@ class Address1(Type):
     flat: str | None = None
     global_id: int | None = None
     validation_state_id: int | None = None
-    validated_at: None = None
-    validation_errors: None = None
+    validated_at: Any | None = None
+    validation_errors: Any | None = None
 
 
 class Address(Type):
@@ -26,16 +28,16 @@ class Address(Type):
     address_id: int | None = None
     address_type_id: int | None = None
     validation_state_id: int | None = None
-    validated_at: None = None
+    validated_at: Any | None = None
     actual_from: str | None = None
     actual_to: str | None = None
     created_by: str | None = None
-    updated_by: None = None
+    updated_by: Any | None = None
     created_at: str | None = None
-    updated_at: None = None
+    updated_at: Any | None = None
     address: Address1 | None = None
     address_type: EveryType | None = None
-    validation_errors: None = None
+    validation_errors: Any | None = None
 
 
 class Attachment(Type):
@@ -48,23 +50,23 @@ class Document(Type):
     id: int | None = None
     person_id: str | None = None
     validation_state_id: int | None = None
-    validated_at: None = None
+    validated_at: Any | None = None
     actual_from: str | None = None
     actual_to: str | None = None
     created_by: str | None = None
-    updated_by: None = None
+    updated_by: Any | None = None
     created_at: str | None = None
-    updated_at: None = None
+    updated_at: Any | None = None
     document_type_id: int | None = None
     series: str | None = None
     number: str | None = None
     subdivision_code: str | None = None
     issuer: str | None = None
     issued: str | None = None
-    expiration: None = None
+    expiration: Any | None = None
     attachments: list[Attachment] | None = None
     document_type: EveryType | None = None
-    validation_errors: None = None
+    validation_errors: Any | None = None
 
 
 class Organization(Type):
@@ -84,19 +86,19 @@ class Class(Type):
     staff_ids: list[int] | None = None
     academic_year_id: int | None = None
     open_at: str | None = None
-    close_at: None = None
+    close_at: Any | None = None
     parallel_id: int | None = None
     education_stage_id: int | None = None
     letter: str | None = None
-    age_group_id: None = None
-    data: None = None
-    notes: None = None
+    age_group_id: Any | None = None
+    data: Any | None = None
+    notes: Any | None = None
     actual_from: str | None = None
     actual_to: str | None = None
     created_by: str | None = None
-    updated_by: None = None
+    updated_by: Any | None = None
     created_at: str | None = None
-    updated_at: None = None
+    updated_at: Any | None = None
     parallel: EveryType | None = None
     organization: Organization | None = None
 
@@ -106,23 +108,23 @@ class Education(Type):
     person_id: str | None = None
     organization_id: int | None = None
     class_uid: str | None = None
-    notes: None = None
+    notes: Any | None = None
     education_form_id: int | None = None
     financing_type_id: int | None = None
     service_type_id: int | None = None
-    deduction_reason_id: None = None
+    deduction_reason_id: Any | None = None
     training_begin_at: str | None = None
     training_end_at: str | None = None
     actual_from: str | None = None
     actual_to: str | None = None
     created_by: str | None = None
-    updated_by: None = None
+    updated_by: Any | None = None
     created_at: str | None = None
-    updated_at: None = None
+    updated_at: Any | None = None
     class_: Class | None = Field(None, alias="class")
     education_form: EveryType | None = None
     financing_type: EveryType | None = None
-    deduction_reason: None = None
+    deduction_reason: Any | None = None
     service_type: EveryType | None = None
     organization: Organization | None = None
 
@@ -130,7 +132,7 @@ class Education(Type):
 class PersonData(Type):
     id: int | None = None
     person_id: str | None = None
-    merged_to: None = None
+    merged_to: Any | None = None
     lastname: str | None = None
     firstname: str | None = None
     patronymic: str | None = None
@@ -140,20 +142,20 @@ class PersonData(Type):
     gender_id: int | None = None
     citizenship_id: int | None = None
     validation_state_id: int | None = None
-    validated_at: None = None
+    validated_at: Any | None = None
     actual_from: str | None = None
     actual_to: str | None = None
     created_by: str | None = None
-    updated_by: None = None
+    updated_by: Any | None = None
     created_at: str | None = None
-    updated_at: None = None
+    updated_at: Any | None = None
     addresses: list[Address] | None = None
     documents: list[Document] | None = None
-    contacts: None = None
-    preventions: None = None
-    categories: None = None
-    agents: None = None
-    children: None = None
+    contacts: Any | None = None
+    preventions: Any | None = None
+    categories: Any | None = None
+    agents: Any | None = None
+    children: Any | None = None
     education: list[Education] | None = None
-    citizenship: None = None
-    validation_errors: None = None
+    citizenship: Any | None = None
+    validation_errors: Any | None = None

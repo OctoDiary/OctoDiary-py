@@ -3,6 +3,8 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
+from typing import Any
+
 from octodiary.types.model import Type
 
 
@@ -14,9 +16,9 @@ class Profile(Type):
     sex: str | None = None
     user_id: int | None = None
     id: int | None = None
-    contract_id: None = None
+    contract_id: Any | None = None
     phone: str | None = None
-    email: None = None
+    email: Any | None = None
     snils: str | None = None
     type: str | None = None
 
@@ -42,21 +44,21 @@ class Representative(Type):
     last_name: str | None = None
     first_name: str | None = None
     middle_name: str | None = None
-    birth_date: None = None
-    sex: None = None
-    user_id: None = None
+    birth_date: Any | None = None
+    sex: Any | None = None
+    user_id: Any | None = None
     id: int | None = None
-    contract_id: None = None
+    contract_id: Any | None = None
     phone: str | None = None
     email: str | None = None
     snils: str | None = None
-    type: None = None
+    type: Any | None = None
 
 
 class Section(Type):
     id: int | None = None
     name: str | None = None
-    subject_id: None = None
+    subject_id: Any | None = None
     is_fake: bool | None = None
 
 
@@ -70,9 +72,9 @@ class Child(Type):
     id: int | None = None
     contract_id: int | None = None
     phone: str | None = None
-    email: None = None
+    email: Any | None = None
     snils: str | None = None
-    type: None = None
+    type: Any | None = None
     school: School | None = None
     class_name: str | None = None
     class_level_id: int | None = None
@@ -81,7 +83,7 @@ class Child(Type):
     representatives: list[Representative] | None = None
     sections: list[Section] | None = None
     sudir_account_exists: bool | None = None
-    sudir_login: None = None
+    sudir_login: Any | None = None
     is_legal_representative: bool | None = None
     parallel_curriculum_id: int | None = None
     contingent_guid: str | None = None

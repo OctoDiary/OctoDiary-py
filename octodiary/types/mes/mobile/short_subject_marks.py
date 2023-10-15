@@ -3,6 +3,8 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
+from typing import Any
+
 from octodiary.types.model import Type
 
 
@@ -26,14 +28,14 @@ class Grade(Type):
 
 
 class Value(Type):
-    name: None = None
+    name: Any | None = None
     grade: Grade | None = None
-    grade_system_id: None = None
+    grade_system_id: Any | None = None
     grade_system_type: str | None = None
 
 
 class Criterion(Type):
-    name: None = None
+    name: Any | None = None
     value: str | None = None
 
 
@@ -43,11 +45,11 @@ class Mark(Type):
     values: list[Value] | None = None
     comment: str | None = None
     weight: int | None = None
-    point_date: None = None
+    point_date: Any | None = None
     control_form_name: str | None = None
     comment_exists: bool | None = None
-    created_at: None = None
-    updated_at: None = None
+    created_at: Any | None = None
+    updated_at: Any | None = None
     criteria: list[Criterion] | None = None
     date: str | None = None
     is_exam: bool | None = None
@@ -66,7 +68,7 @@ class Payload(Type):
     end: str | None = None
     subject_name: str | None = None
     subject_id: int | None = None
-    fixed_value: None = None
+    fixed_value: Any | None = None
 
 
 class ShortSubjectMarks(Type):
