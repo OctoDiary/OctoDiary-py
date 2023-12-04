@@ -69,7 +69,7 @@ class PayloadItem(Type):
     end: Optional[str]
     subject_name: Optional[str] = None
     subject_id: Optional[int] = None
-    fixed_value: Optional[Any] = None
+    fixed_value: Optional[str] = None
 
 
 class ShortSubjectMarks(Type):

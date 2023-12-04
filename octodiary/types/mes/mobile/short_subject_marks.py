@@ -68,7 +68,7 @@ class Payload(Type):
     end: str | None = None
     subject_name: str | None = None
     subject_id: int | None = None
-    fixed_value: Any | None = None
+    fixed_value: str | None = None
 
 
 class ShortSubjectMarks(Type):
