@@ -3,7 +3,7 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-__version__ = "0.2.6"
+__version__ = "0.2.8"
 
 from octodiary import asyncApi, exceptions, syncApi, types
 from octodiary.urls import MySchoolURLs

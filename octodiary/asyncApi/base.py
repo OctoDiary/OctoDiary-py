@@ -55,11 +55,11 @@ class AsyncBaseApi(SyncBaseApi):
                         description=json_response.get("description", None),
                         details=json_response.get("details", None),
                     )
-            except JSONDecodeError as error:
+            except (JSONDecodeError, aiohttp.ContentTypeError) as error:
                 raise APIError(
                     url=str(response.url),
                     status_code=response.status,
-                    error_type="ServerError & JSONError",
+                    error_type="ServerError & ContentTypeError",
                     description=(await response.text()),
                     details=None
                 ) from error
