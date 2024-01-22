@@ -214,7 +214,12 @@ class SyncMobileAPI(SyncBaseApi):
         Returns:
             A list of `UsersProfilesInfo` objects representing the profiles information of multiple users.
         """
-        return self.get(url=MesURLs.PROFILE_INFO, model=UsersProfilesInfo, is_list=True)
+        return self.get(
+            url=MesURLs.PROFILE_INFO,
+            model=UsersProfilesInfo,
+            is_list=True,
+            custom_headers={"partner-source-id": "MOBILE"}
+        )
 
     def get_family_profile(self, profile_id: int) -> FamilyProfile:
         """
