@@ -39,6 +39,13 @@ class Type(BaseModel):
         )
 
 
+    class Config:
+        json_encoders: typing.ClassVar[dict] = {
+            date: lambda v: v.strftime("%Y-%m-%d"),
+            datetime: lambda v: v.strftime("%Y-%m-%dT%H:%M:%S"),
+        }
+
+
 class EveryType(Type):
     id: int
     name: str

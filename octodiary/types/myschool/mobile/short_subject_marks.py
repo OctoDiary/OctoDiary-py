@@ -18,7 +18,7 @@ class Path(Type):
 class TargetItem(Type):
     value: Optional[int] = None
     remain: Optional[int] = None
-    round: Optional[str]
+    round: Optional[str] = None
     paths: Optional[list[Path]] = []
 
 
