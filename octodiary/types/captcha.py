@@ -3,7 +3,7 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from typing import Any
+from typing import Any, Optional
 
 from octodiary.types.model import Type
 
@@ -12,7 +12,7 @@ class Captcha(Type):
     gosuslugi_type: str
     guid: str
     image_bytes: bytes | None = None
-    question: str | None = None
+    question: Optional[str] = None
     api: Any
     api_session: Any
 

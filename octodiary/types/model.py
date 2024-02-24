@@ -10,6 +10,8 @@ from enum import Enum
 
 from pydantic import BaseModel
 
+DT = typing.Union[datetime, date, None, typing.Any]
+
 
 class Type(BaseModel):
     @staticmethod
@@ -41,8 +43,8 @@ class Type(BaseModel):
 
     class Config:
         json_encoders: typing.ClassVar[dict] = {
-            date: lambda v: v.strftime("%Y-%m-%d"),
-            datetime: lambda v: v.strftime("%Y-%m-%dT%H:%M:%S"),
+            date: (lambda v: v.strftime("%Y-%m-%d")),
+            datetime: (lambda v: v.strftime("%Y-%m-%dT%H:%M:%S")),
         }
 
 

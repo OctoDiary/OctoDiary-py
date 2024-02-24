@@ -21,7 +21,7 @@
 
 ### Новейшая версия:
 ``` bash
-$ pip install https://github.com/OctoDiary/OctoDiary-py/archive/main.zip --upgrade
+$ pip install https://github.com/OctoDiary/OctoDiary-py/archive/main.zip --upgrade --force-reinstall
 ```
 
 ### Стабильная версия:

@@ -3,15 +3,22 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-from typing import Any, Optional
+from typing import Optional, Union
 
 
 class APIError(Exception):
-    """Обработка всех ошибок"""
+    """Base class for all API errors"""
 
-    def __init__(self, url: str, status_code: int, error_type: str, description: Optional[str] = None,
-                 details: Optional[Any] = None) -> None:
-        error_text = f"API-Error [{status_code}] - {error_type}:\nURL: {url}"
+    def __init__(
+            self,
+            url: str,
+            status_code: int,
+            error_types: Union[str, list[str]],
+            description: Optional[str] = None,
+            details = None
+        ) -> None:
+        errors = " & ".join(error_types) if isinstance(error_types, list) else error_types
+        error_text = f"API-Error [{status_code}] - {errors}:\nURL: {url}"
 
         if description:
             error_text += f"\n{description}"
@@ -21,5 +28,5 @@ class APIError(Exception):
         self.url = url
         self.status_code = status_code
         self.description = description
-        self.error_type = error_type
+        self.errors = self.error_types = error_types
         self.details = details

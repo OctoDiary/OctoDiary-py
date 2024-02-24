@@ -3,16 +3,14 @@
 #        https://opensource.org/licenses/MIT
 #           https://github.com/OctoDiary
 
-__version__ = "0.2.9"
+__version__ = "0.3.0"
 
-from octodiary import asyncApi, exceptions, syncApi, types
-from octodiary.urls import MySchoolURLs
+from octodiary import apis, exceptions, types, urls
 
 __all__ = [
-    "asyncApi",
-    "syncApi",
+    "apis",
     "exceptions",
     "types",
-    "MySchoolURLs",
+    "urls",
     "__version__"
 ]
