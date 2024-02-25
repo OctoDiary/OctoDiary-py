@@ -483,7 +483,7 @@ class SyncMobileAPI(SyncBaseAPI):
         """
         self.request(
             method="PUT",
-            base_url=BaseURL(type=URLTypes.DNEVNIK, system=self.system),
+            base_url=BaseURL(type=URLTypes.DNEVNIK if self.system == Systems.MYSCHOOL else URLTypes.SCHOOL, system=self.system),
             path="/api/usersettings/v1",
             params={
                 "name": name,
