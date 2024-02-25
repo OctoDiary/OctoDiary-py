@@ -10,7 +10,7 @@ import random
 import re
 import string
 from datetime import date
-from typing import Optional, Union
+from typing import Optional, TypeVar, Union
 
 from requests import Response
 from requests.utils import dict_from_cookiejar
@@ -47,8 +47,11 @@ from octodiary.types.mobile import (
     Visits,
 )
 from octodiary.types.mobile.subject_marks import SubjectsMarks
+from octodiary.types.model import Type
 from octodiary.types.web import SessionUserInfo
 from octodiary.urls import BaseURL, Systems, URLTypes
+
+T = TypeVar("T", bound=Type)
 
 
 class SyncMobileAPI(SyncBaseAPI):
@@ -428,8 +431,9 @@ class SyncMobileAPI(SyncBaseAPI):
             self,
             profile_id: int,
             name: str = "settings_group_v1",
-            subsystem_id: int = 1
-    ) -> UserSettings:
+            subsystem_id: int = 1,
+            settings_model: type[T] = UserSettings
+    ) -> "T | UserSettings":
         """
         Get user settings
 
@@ -437,9 +441,10 @@ class SyncMobileAPI(SyncBaseAPI):
             profile_id (int): The ID of the profile.
             name (str, optional): The name of the settings group. Defaults to "settings_group_v1".
             subsystem_id (int, optional): The ID of the subsystem. Defaults to 1.
+            settings_model (type[T], optional): The settings model. Defaults to UserSettings.
 
         Returns:
-            UserSettings: The user settings object.
+            T(TypeModel) | UserSettings: The user settings object.
 
         Raises:
             None.
@@ -457,12 +462,12 @@ class SyncMobileAPI(SyncBaseAPI):
                 "client-type": "diary-mobile",
                 "profile-id": profile_id
             },
-            model=UserSettings,
+            model=settings_model,
         )
 
     def edit_user_settings_app(
             self,
-            settings: UserSettings,
+            settings: Type,
             profile_id: int,
             name: str = "settings_group_v1",
             subsystem_id: int = 1,
@@ -471,7 +476,7 @@ class SyncMobileAPI(SyncBaseAPI):
         Edit user settings
 
         Args:
-            settings (UserSettings): The user settings object.
+            settings (Type | UserSettings): The user settings object.
             profile_id (int): The ID of the profile.
             name (str, optional): The name of the settings group. Defaults to "settings_group_v1".
             subsystem_id (int, optional): The ID of the subsystem. Defaults to 1.

@@ -9,7 +9,7 @@ import random
 import re
 import string
 from datetime import date
-from typing import Optional, Union
+from typing import Optional, TypeVar, Union
 
 from aiohttp import ClientResponse, ClientSession
 from aiohttp.cookiejar import CookieJar
@@ -46,8 +46,11 @@ from octodiary.types.mobile import (
     Visits,
 )
 from octodiary.types.mobile.subject_marks import SubjectsMarks
+from octodiary.types.model import Type
 from octodiary.types.web import SessionUserInfo
 from octodiary.urls import BaseURL, Systems, URLTypes
+
+T = TypeVar("T", bound=Type)
 
 
 class AsyncMobileAPI(AsyncBaseAPI):
@@ -435,8 +438,9 @@ class AsyncMobileAPI(AsyncBaseAPI):
             self,
             profile_id: int,
             name: str = "settings_group_v1",
-            subsystem_id: int = 1
-    ) -> UserSettings:
+            subsystem_id: int = 1,
+            settings_model: type[T] = UserSettings
+    ) -> T:
         """
         Get user settings
 
@@ -444,9 +448,10 @@ class AsyncMobileAPI(AsyncBaseAPI):
             profile_id (int): The ID of the profile.
             name (str, optional): The name of the settings group. Defaults to "settings_group_v1".
             subsystem_id (int, optional): The ID of the subsystem. Defaults to 1.
+            settings_model (type[T], optional): The settings model. Defaults to UserSettings.
 
         Returns:
-            UserSettings: The user settings object.
+            T (Type model) or UserSettings: The user settings object.
 
         Raises:
             None.
@@ -464,12 +469,12 @@ class AsyncMobileAPI(AsyncBaseAPI):
                 "client-type": "diary-mobile",
                 "profile-id": profile_id
             },
-            model=UserSettings,
+            model=settings_model
         )
 
     async def edit_user_settings_app(
             self,
-            settings: UserSettings,
+            settings: Type,
             profile_id: int,
             name: str = "settings_group_v1",
             subsystem_id: int = 1,
@@ -478,7 +483,7 @@ class AsyncMobileAPI(AsyncBaseAPI):
         Edit user settings
 
         Args:
-            settings (UserSettings): The user settings object.
+            settings (TypeModel or UserSettings): The user settings object.
             profile_id (int): The ID of the profile.
             name (str, optional): The name of the settings group. Defaults to "settings_group_v1".
             subsystem_id (int, optional): The ID of the subsystem. Defaults to 1.
