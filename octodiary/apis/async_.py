@@ -155,10 +155,11 @@ class AsyncMobileAPI(AsyncBaseAPI):
                     "login": username,
                     "password": password,
                     "proofOfWork": proof_of_work
-                }
+                },
+                allow_redirects=False,
             )
 
-            return await self._handle_login_response(resp, await resp.json())
+            return await self._handle_login_response(resp, await resp.json() if "{" in await resp.text() else {})
 
     async def handle_action(self, response: ClientResponse, action: Optional[str] = None, failed: Optional[str] = None) -> str | bool:
         match failed or action:
@@ -309,6 +310,10 @@ class AsyncMobileAPI(AsyncBaseAPI):
             return self.token
         elif response.status == 200 and (token := response.cookies.get("aupd_token")):
             return token.value
+        elif "Location" in response.headers and (location := response.headers.get("Location")) and "?code=" in location:
+            return await self._handle_login_response(response, {
+                "trust_code": location.split("?code=")[1]
+            })
 
         return None
 

@@ -151,10 +151,10 @@ class SyncMobileAPI(SyncBaseAPI):
                     "login": username,
                     "password": password,
                     "proofOfWork": proof_of_work
-                }
+                }, allow_redirects=False
             )
 
-            return self._handle_login_response(resp, resp.json())
+            return self._handle_login_response(resp, resp.json() if "{" in resp.text else {})
 
     def handle_action(self, response: Response, action: Optional[str] = None, failed: Optional[str] = None) -> str | bool:
         match failed or action:
@@ -266,6 +266,7 @@ class SyncMobileAPI(SyncBaseAPI):
                     return self._handle_login_response(resp, resp.json())
 
 
+
         if json.get("inquire", None) == "enter_sms_code":
             json["api_class"] = self
             return EnterSmsCode.model_validate(json)
@@ -297,6 +298,10 @@ class SyncMobileAPI(SyncBaseAPI):
             return self.token
         elif response.status_code == 200 and (token := dict_from_cookiejar(response.cookies).get("aupd_token")):
             return token
+        elif "Location" in response.headers and (location := response.headers.get("Location")) and "?code=" in location:
+            return self._handle_login_response(response, {
+                "trust_code": location.split("?code=")[1]
+            })
 
         return None
 
