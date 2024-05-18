@@ -746,7 +746,7 @@ class AsyncMobileAPI(AsyncBaseAPI):
             base_url=BaseURL(type=URLTypes.SCHOOL_API, system=self.system),
             path=f"/family/mobile/v1/programs/parallel_curriculum/{id}",
             model=ParallelCurriculum,
-            is_list=True,
+            is_list=False,
             params={
                 "student_id": student_id,
             },
