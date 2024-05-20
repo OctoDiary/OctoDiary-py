@@ -49,20 +49,20 @@ class SyncBaseAPI:
             msg = "Token is required!"
             raise ValueError(msg)
         elif require_token:
-            HEADERS.update({
-                "Authorization": f"Bearer {self.token}",
-                "Auth-Token": self.token,
-                "Cookie": "aupdtoken=" + self.token + "; aupd_token=" + self.token + (
-                    f"; {custom_headers.pop('Cookie')}"
-                    if custom_headers
-                       and "Cookie" in custom_headers
-                    else ""
-                )
-            })
+            HEADERS.update(
+                {
+                    "Authorization": f"Bearer {self.token}",
+                    "Auth-Token": self.token,
+                    "Cookie": "aupdtoken="
+                    + self.token
+                    + "; aupd_token="
+                    + self.token
+                    + (f"; {custom_headers.pop('Cookie')}" if custom_headers and "Cookie" in custom_headers else ""),
+                }
+            )
 
         HEADERS.update(custom_headers or {})
         return HEADERS
-
 
     @staticmethod
     def _resolve_proof_of_work(proof_of_work: str) -> str:
@@ -77,6 +77,7 @@ class SyncBaseAPI:
         Returns:
             Hashcash stamp string.
         """
+
         def check_hash_for_cash(digest_bytes, zero_bits):
             bit_counter = 0
 
@@ -105,44 +106,43 @@ class SyncBaseAPI:
         while True:
             counter_string = hex(counter)[2:]
 
-            if check_hash_for_cash(
-                hashlib.sha1(
-                    header_bytes + counter_string.encode()
-                ).digest(), 15
-            ):
+            if check_hash_for_cash(hashlib.sha1(header_bytes + counter_string.encode()).digest(), 15):
                 break
             counter += 1
 
         return proof_of_work + counter_string
 
-
     @staticmethod
     def init_params(url: str, params: dict) -> str:
         boolean = {True: "true", False: "false"}
         return (
-                f"{url}?" + "&".join(
-            [
-                f"{X}={Y}" for X, Y in {
-                    X: Y
-                    if isinstance(Y, (str, float, int))
-                    else boolean[Y]
-                    if isinstance(Y, bool)
-                    else "null"
-                    if Y is None
-                    else str(Y)
-                    for X, Y in params.items()
-                }.items()
-            ]
+            (
+                f"{url}?"
+                + "&".join(
+                    [
+                        f"{X}={Y}"
+                        for X, Y in {
+                            X: (
+                                Y
+                                if isinstance(Y, (str, float, int))
+                                else boolean[Y] if isinstance(Y, bool) else "null" if Y is None else str(Y)
+                            )
+                            for X, Y in params.items()
+                        }.items()
+                    ]
+                )
+            )
+            if params
+            else url
         )
-        ) if params else url
 
     def __init__(
-            self,
-            system: str,
-            token: Optional[str] = None,
-            token_for_refresh: Optional[str] = None,
-            client_id: Optional[str] = None,
-            client_secret: Optional[str] = None
+        self,
+        system: str,
+        token: Optional[str] = None,
+        token_for_refresh: Optional[str] = None,
+        client_id: Optional[str] = None,
+        client_secret: Optional[str] = None,
     ) -> None:
         self.system = system
         self.token = token
@@ -196,27 +196,29 @@ class SyncBaseAPI:
                     status_code=response.status_code,
                     error_types="JSONError",
                     description=response.text,
-                    details=response
+                    details=response,
                 ) from e
 
     def request(
-            self, method: str,
-            base_url: str, path: str,
-            custom_headers: Optional[dict] = None,
-            model: Optional[type[Type]] = None,
-            is_list: bool = False,
-            return_json: bool = False,
-            return_raw_text: bool = False,
-            required_token: bool = True,
-            return_raw_response: bool = False,
-            **kwargs
+        self,
+        method: str,
+        base_url: str,
+        path: str,
+        custom_headers: Optional[dict] = None,
+        model: Optional[type[Type]] = None,
+        is_list: bool = False,
+        return_json: bool = False,
+        return_raw_text: bool = False,
+        required_token: bool = True,
+        return_raw_response: bool = False,
+        **kwargs,
     ):
         params = kwargs.pop("params", {})
         response = self.session.request(
             method=method,
             url=self.init_params(base_url + path, params),
             headers=self.headers(required_token, custom_headers),
-            **kwargs
+            **kwargs,
         )
         self._check_response(response)
         raw_text = response.text
@@ -227,15 +229,19 @@ class SyncBaseAPI:
         return (
             response
             if return_raw_response
-            else response.json()
-            if return_json
-            else raw_text
-            if return_raw_text
-            else self.parse_list_models(model, raw_text)
-            if is_list
-            else model.model_validate_json(raw_text)
-            if model
-            else raw_text
+            else (
+                response.json()
+                if return_json
+                else (
+                    raw_text
+                    if return_raw_text
+                    else (
+                        self.parse_list_models(model, raw_text)
+                        if is_list
+                        else model.model_validate_json(raw_text) if model else raw_text
+                    )
+                )
+            )
         )
 
 
@@ -264,28 +270,30 @@ class AsyncBaseAPI(SyncBaseAPI):
                     status_code=response.status,
                     error_types=["ServerError", "ContentTypeError"],
                     description=(await response.text()),
-                    details=response
+                    details=response,
                 ) from error
 
     async def request(
-            self, method: str,
-            base_url: str, path: str,
-            custom_headers: Optional[dict] = None,
-            model: Optional[type[Type]] = None,
-            is_list: bool = False,
-            return_json: bool = False,
-            return_raw_text: bool = False,
-            required_token: bool = True,
-            return_raw_response: bool = False,
-            **kwargs
+        self,
+        method: str,
+        base_url: str,
+        path: str,
+        custom_headers: Optional[dict] = None,
+        model: Optional[type[Type]] = None,
+        is_list: bool = False,
+        return_json: bool = False,
+        return_raw_text: bool = False,
+        required_token: bool = True,
+        return_raw_response: bool = False,
+        **kwargs,
     ):
         params = kwargs.pop("params", {})
         async with aiohttp.ClientSession() as session:
             async with session.request(
-                    method=method,
-                    url=self.init_params(base_url + path, params),
-                    headers=self.headers(required_token, custom_headers),
-                    **kwargs
+                method=method,
+                url=self.init_params(base_url + path, params),
+                headers=self.headers(required_token, custom_headers),
+                **kwargs,
             ) as response:
                 await self._check_response(response)
                 raw_text = await response.text()
@@ -296,13 +304,17 @@ class AsyncBaseAPI(SyncBaseAPI):
                 return (
                     response
                     if return_raw_response
-                    else await response.json()
-                    if return_json
-                    else raw_text
-                    if return_raw_text
-                    else self.parse_list_models(model, raw_text)
-                    if is_list
-                    else model.model_validate_json(raw_text)
-                    if model
-                    else raw_text
+                    else (
+                        await response.json()
+                        if return_json
+                        else (
+                            raw_text
+                            if return_raw_text
+                            else (
+                                self.parse_list_models(model, raw_text)
+                                if is_list
+                                else model.model_validate_json(raw_text) if model else raw_text
+                            )
+                        )
+                    )
                 )
